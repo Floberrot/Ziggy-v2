@@ -1,0 +1,204 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+parameters:
+    app.frontend_base_url: '%env(FRONTEND_BASE_URL)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+
+    # Bind buses by name
+    App\Identity\Application\Command\RegisterOwner\RegisterOwnerHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Identity\Application\Query\GetUser\GetUserHandler:
+        tags:
+            - { name: messenger.message_handler, bus: query.bus }
+
+    App\Identity\Application\Command\AcceptInvitation\AcceptInvitationHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Cat\Application\Command\AddCat\AddCatHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Cat\Application\Query\ListCats\ListCatsHandler:
+        tags:
+            - { name: messenger.message_handler, bus: query.bus }
+
+    App\ChipType\Application\Command\CreateChipType\CreateChipTypeHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\ChipType\Application\Query\ListChipTypes\ListChipTypesHandler:
+        tags:
+            - { name: messenger.message_handler, bus: query.bus }
+
+    App\Calendar\Application\Command\PlaceChip\PlaceChipHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Calendar\Application\Query\GetCalendar\GetCalendarHandler:
+        tags:
+            - { name: messenger.message_handler, bus: query.bus }
+
+    App\Calendar\Application\Command\RemoveChip\RemoveChipHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Identity\Application\Command\UpdateUsername\UpdateUsernameHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Identity\Application\Command\SendInvitation\SendInvitationHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Identity\Application\Command\RevokeInvitation\RevokeInvitationHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Identity\Application\Command\RequestPasswordReset\RequestPasswordResetHandler:
+        arguments:
+            $frontendBaseUrl: '%app.frontend_base_url%'
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Identity\Application\Command\ResetPassword\ResetPasswordHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Identity\Application\Query\ListInvitations\ListInvitationsHandler:
+        tags:
+            - { name: messenger.message_handler, bus: query.bus }
+
+    App\Cat\Application\Command\UpdateCat\UpdateCatHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Cat\Application\Command\RemoveCat\RemoveCatHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\Cat\Application\Query\GetCat\GetCatHandler:
+        tags:
+            - { name: messenger.message_handler, bus: query.bus }
+
+    App\ChipType\Application\Command\UpdateChipType\UpdateChipTypeHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    App\ChipType\Application\Command\RemoveChipType\RemoveChipTypeHandler:
+        tags:
+            - { name: messenger.message_handler, bus: command.bus }
+
+    # EventBus port -> Messenger implementation
+    App\Shared\Domain\EventBus:
+        alias: App\Shared\Infrastructure\MessengerEventBus
+
+    App\Shared\Infrastructure\MessengerEventBus:
+        arguments:
+            $eventBus: '@event.bus'
+
+    # Repository bindings
+    App\Identity\Domain\Repository\UserRepository:
+        alias: App\Identity\Infrastructure\Output\Persistence\DoctrineUserRepository
+
+    App\Identity\Domain\Repository\InvitationRepository:
+        alias: App\Identity\Infrastructure\Output\Persistence\DoctrineInvitationRepository
+
+    App\Identity\Domain\Repository\PasswordResetTokenRepository:
+        alias: App\Identity\Infrastructure\Output\Persistence\DoctrinePasswordResetTokenRepository
+
+    App\Cat\Domain\Repository\CatRepository:
+        alias: App\Cat\Infrastructure\Output\Persistence\DoctrineCatRepository
+
+    App\ChipType\Domain\Repository\ChipTypeRepository:
+        alias: App\ChipType\Infrastructure\Output\Persistence\DoctrineChipTypeRepository
+
+    App\Calendar\Domain\Repository\CalendarRepository:
+        alias: App\Calendar\Infrastructure\Output\Persistence\DoctrineCalendarRepository
+
+    # Controller bus bindings
+    App\Identity\Infrastructure\Input\Http\RegisterOwnerController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Identity\Infrastructure\Input\Http\AcceptInvitationController:
+        arguments:
+            $commandBus: '@command.bus'
+
+
+    App\Cat\Infrastructure\Input\Http\AddCatController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Cat\Infrastructure\Input\Http\ListCatsController:
+        arguments:
+            $queryBus: '@query.bus'
+
+    App\ChipType\Infrastructure\Input\Http\CreateChipTypeController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\ChipType\Infrastructure\Input\Http\ListChipTypesController:
+        arguments:
+            $queryBus: '@query.bus'
+
+    App\Calendar\Infrastructure\Input\Http\PlaceChipController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Calendar\Infrastructure\Input\Http\GetCalendarController:
+        arguments:
+            $queryBus: '@query.bus'
+
+    App\Calendar\Infrastructure\Input\Http\RemoveChipController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Cat\Infrastructure\Input\Http\GetCatController:
+        arguments:
+            $queryBus: '@query.bus'
+
+    App\Cat\Infrastructure\Input\Http\UpdateCatController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Cat\Infrastructure\Input\Http\RemoveCatController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\ChipType\Infrastructure\Input\Http\UpdateChipTypeController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\ChipType\Infrastructure\Input\Http\RemoveChipTypeController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Identity\Infrastructure\Input\Http\SendInvitationController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Identity\Infrastructure\Input\Http\ListInvitationsController:
+        arguments:
+            $queryBus: '@query.bus'
+
+    App\Identity\Infrastructure\Input\Http\RevokeInvitationController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Identity\Infrastructure\Input\Http\RequestPasswordResetController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Identity\Infrastructure\Input\Http\ResetPasswordController:
+        arguments:
+            $commandBus: '@command.bus'

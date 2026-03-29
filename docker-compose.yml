@@ -1,0 +1,104 @@
+services:
+  app:
+    build:
+      context: ./back
+      target: dev
+    volumes:
+      - ./back:/app
+      - /app/vendor
+    ports:
+      - "80:80"
+    environment:
+      - APP_ENV=dev
+      - APP_SECRET=${APP_SECRET:-change_me_in_production}
+      - SERVER_NAME=:80
+      - DATABASE_URL=postgresql://ziggy:ziggy@db:5432/ziggy?serverVersion=16&charset=utf8
+      - MAILER_DSN=smtp://mailpit:1025
+      - MESSENGER_TRANSPORT_DSN=doctrine://default
+      - JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
+      - JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
+      - JWT_PASSPHRASE=${JWT_PASSPHRASE:-your_passphrase}
+      - FRONTEND_BASE_URL=http://localhost:5173
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ziggy
+
+  front:
+    build:
+      context: ./front
+    volumes:
+      - ./front:/app
+      - front_node_modules:/app/node_modules
+    ports:
+      - "5173:5173"
+    networks:
+      - ziggy
+    depends_on:
+      - app
+
+  worker:
+    build:
+      context: ./back
+      target: dev
+    command: php bin/console messenger:consume async --limit=0 -vv
+    volumes:
+      - ./back:/app
+      - /app/vendor
+    environment:
+      - APP_ENV=dev
+      - APP_SECRET=${APP_SECRET:-change_me_in_production}
+      - DATABASE_URL=postgresql://ziggy:ziggy@db:5432/ziggy?serverVersion=16&charset=utf8
+      - MAILER_DSN=smtp://mailpit:1025
+      - MESSENGER_TRANSPORT_DSN=doctrine://default
+      - JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
+      - JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
+      - JWT_PASSPHRASE=${JWT_PASSPHRASE:-your_passphrase}
+      - FRONTEND_BASE_URL=http://localhost:5173
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    networks:
+      - ziggy
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"   # Web UI
+      - "1025:1025"   # SMTP
+    environment:
+      MP_MAX_MESSAGES: 500
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - ziggy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ziggy
+      POSTGRES_USER: ziggy
+      POSTGRES_PASSWORD: ziggy
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ziggy -d ziggy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ziggy
+
+networks:
+  ziggy:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  front_node_modules:

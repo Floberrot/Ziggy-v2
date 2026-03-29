@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* ── Light theme (default) ──────────────────────────────────────────────── */
+:root {
+  --bg:        #faf9f7;
+  --surface:   #ffffff;
+  --surface-2: #f3f1ee;
+  --surface-3: #e9e6e0;
+  --border:    rgba(0, 0, 0, 0.07);
+  --border-md: rgba(0, 0, 0, 0.13);
+  --text:      #1c1a1f;
+  --text-2:    #6b6878;
+  --text-3:    #9b98a8;
+}
+
+/* ── Dark theme ─────────────────────────────────────────────────────────── */
+html.dark {
+  --bg:        #0b0b13;
+  --surface:   #13131d;
+  --surface-2: #1c1c28;
+  --surface-3: #252534;
+  --border:    rgba(255, 255, 255, 0.07);
+  --border-md: rgba(255, 255, 255, 0.12);
+  --text:      #eeeef5;
+  --text-2:    #8888a8;
+  --text-3:    #55556e;
+}
+
+html, body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* ── Custom scrollbar ───────────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: var(--surface); }
+::-webkit-scrollbar-thumb  { background: var(--surface-3); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-md); }

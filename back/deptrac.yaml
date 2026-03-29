@@ -1,0 +1,43 @@
+deptrac:
+    paths:
+        - src
+
+    layers:
+        - name: Domain
+          collectors:
+              - type: directory
+                value: src/.+/Domain/.+
+
+        - name: Application
+          collectors:
+              - type: directory
+                value: src/.+/Application/.+
+
+        - name: Infrastructure
+          collectors:
+              - type: directory
+                value: src/.+/Infrastructure/.+
+
+        - name: Shared
+          collectors:
+              - type: directory
+                value: src/Shared/.+
+
+    ruleset:
+        Domain:
+            - Shared
+
+        Application:
+            - Domain
+            - Shared
+
+        Infrastructure:
+            - Application
+            - Domain
+            - Shared
+
+        Shared: []
+
+    formatters:
+        graphviz:
+            point_to_groups: true

@@ -1,0 +1,7 @@
+framework:
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+        envelope:
+            sender: 'noreply@ziggy.dev'
+        headers:
+            From: 'Ziggy <noreply@ziggy.dev>'
