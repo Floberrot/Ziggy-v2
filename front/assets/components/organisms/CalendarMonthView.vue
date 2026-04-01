@@ -81,7 +81,7 @@ function chipTime(chip: EnrichedChip): string {
         v-for="cell in days"
         :key="cell.date"
         :class="[
-          'min-h-20 rounded-xl p-1 flex flex-col gap-0.5 cursor-pointer transition-all group',
+          'min-h-20 rounded-xl p-1 flex flex-col gap-0.5 sm:cursor-pointer transition-all group',
           cell.outside ? 'opacity-20 pointer-events-none' : '',
           cell.date === today
             ? 'bg-rose-500 shadow-lg shadow-rose-500/30 ring-1 ring-rose-400/50'
