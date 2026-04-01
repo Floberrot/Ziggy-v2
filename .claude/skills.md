@@ -72,3 +72,18 @@
 **Key rules:**
 - Use multi-stage builds to minimize final image size
 - Never run package managers or project scripts directly on the host; use `docker exec`
+
+---
+
+## Plan & Ship (full dev cycle)
+
+| Situation | Skill |
+|---|---|
+| User asks to "make a plan and execute it", "plan and ship", or any variant | `plan-and-ship` |
+
+**Key rules:**
+- Always enter plan mode and get explicit approval before writing code
+- Run `phpcbf` → `phpcs` → `phpstan` → `deptrac` → `vue-tsc` in order; fix all errors before the next tool
+- Never open a PR if any quality gate fails
+- Branch naming: `<type>/<kebab-description>` (e.g. `feat/user-email-verification`)
+- Commit messages follow Conventional Commits format

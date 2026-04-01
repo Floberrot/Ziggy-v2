@@ -32,6 +32,17 @@ Stack: **Symfony UX · Vue 3 · FrankenPHP · Docker**
 - Do not create DomainEvent if no listener used them. All code MUST be clear, used and clean.
 - SRP should be main thing. A handler should not do anything. Create as much as you can services/ports and call them with DI. 
 
+## Plan & Ship
+
+When the user says **"make a plan and execute it"**, **"plan and ship"**, or any equivalent phrasing, you **must** invoke the `plan-and-ship` skill. This skill enforces the full lifecycle:
+
+1. Enter plan mode — present a structured plan and wait for explicit approval.
+2. Implement following all architecture and code quality rules.
+3. Run all quality gates in order: `phpcbf` → `phpcs` → `phpstan` → `deptrac` → `vue-tsc` (if frontend touched). Fix every error before opening a PR.
+4. Checkout a feature branch, commit (Conventional Commits), push, and open a PR with `gh pr create`.
+
+**Never open a PR if any quality gate fails.**
+
 ## Sub-files
 
 @.claude/backend.md
