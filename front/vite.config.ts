@@ -13,9 +13,7 @@ export default defineConfig({
   build: {
     outDir: 'public/build',
     rollupOptions: {
-      input: {
-        app: resolve(__dirname, 'assets/app.ts'),
-      },
+      input: resolve(__dirname, 'index.html'),
     },
   },
   server: {

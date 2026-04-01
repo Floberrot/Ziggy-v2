@@ -38,6 +38,9 @@ COPY . .
 
 RUN composer install --no-dev --no-interaction --optimize-autoloader --classmap-authoritative
 
-RUN php bin/console cache:warmup
+COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 80 443
+
+ENTRYPOINT ["docker-entrypoint.sh"]
