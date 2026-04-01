@@ -11,9 +11,11 @@ import BaseModal from '../molecules/BaseModal.vue'
 import ChipTypeRow from '../organisms/ChipTypeRow.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
 import { useAuthStore } from '../../stores/useAuthStore'
+import { useUiStore } from '../../stores/useUiStore'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 const queryClient = useQueryClient()
 
 const { data: chipTypes, isPending, isError } = useQuery({
@@ -94,6 +96,7 @@ const { mutate: createChipType, isPending: creating } = useMutation({
   mutationFn: (data: CreateChipTypeRequest) => chipTypesApi.create(data),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['chip-types'] })
+    uiStore.addNotification('Chip type created.', 'success')
     closeModal()
   },
   onError: (err) => { formError.value = err instanceof Error ? err.message : 'Failed.' },
@@ -104,6 +107,7 @@ const { mutate: updateChipType, isPending: updating } = useMutation({
     chipTypesApi.update(id, data),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['chip-types'] })
+    uiStore.addNotification('Chip type updated.', 'success')
     closeModal()
   },
   onError: (err) => { formError.value = err instanceof Error ? err.message : 'Failed.' },
@@ -111,7 +115,13 @@ const { mutate: updateChipType, isPending: updating } = useMutation({
 
 const { mutate: deleteChipType } = useMutation({
   mutationFn: (id: string) => chipTypesApi.remove(id),
-  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['chip-types'] }),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['chip-types'] })
+    uiStore.addNotification('Chip type deleted.', 'success')
+  },
+  onError: (err) => {
+    uiStore.addNotification(err instanceof Error ? err.message : 'Failed to delete chip type.', 'error')
+  },
 })
 
 function handleSubmit(): void {

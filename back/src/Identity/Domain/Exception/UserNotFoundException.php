@@ -8,8 +8,8 @@ use App\Shared\Domain\Exception\NotFoundException;
 
 final class UserNotFoundException extends NotFoundException
 {
-    public function __construct()
+    public function __construct(string $userId)
     {
-        parent::__construct('User not found.');
+        parent::__construct(sprintf('User "%s" not found.', $userId));
     }
 }

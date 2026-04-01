@@ -60,6 +60,13 @@ services:
         tags:
             - { name: messenger.message_handler, bus: command.bus }
 
+    App\Identity\Application\Port\InvitationMailer:
+        alias: App\Identity\Infrastructure\Output\Notification\MailInvitationMailer
+
+    App\Identity\Infrastructure\Output\Notification\MailInvitationMailer:
+        arguments:
+            $frontendBaseUrl: '%app.frontend_base_url%'
+
     App\Identity\Application\Command\RevokeInvitation\RevokeInvitationHandler:
         tags:
             - { name: messenger.message_handler, bus: command.bus }

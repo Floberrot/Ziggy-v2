@@ -45,6 +45,7 @@ final readonly class RegisterOwnerHandler
             email: $email,
             hashedPassword: $hashedPassword,
             role: Role::OWNER,
+            username: $command->username,
         );
 
         $this->userRepository->save($user);

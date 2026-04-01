@@ -25,7 +25,6 @@ const router = createRouter({
       path: '/invitation/accept',
       name: 'accept-invitation',
       component: () => import('../components/pages/AcceptInvitationPage.vue'),
-      meta: { guestOnly: true },
     },
     {
       path: '/forgot-password',

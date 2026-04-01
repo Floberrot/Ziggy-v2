@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Identity\Domain\Exception;
 
-final class InvalidPasswordResetTokenException extends \DomainException
+use App\Shared\Domain\Exception\BusinessRuleException;
+
+final class InvalidPasswordResetTokenException extends BusinessRuleException
 {
     public function __construct()
     {
