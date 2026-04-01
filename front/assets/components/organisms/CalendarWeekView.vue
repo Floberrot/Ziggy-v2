@@ -51,7 +51,7 @@ function chipTime(chip: EnrichedChip): string {
 </script>
 
 <template>
-  <div class="grid grid-cols-7 gap-1.5">
+  <div class="grid grid-cols-1 sm:grid-cols-7 gap-1.5">
     <div
       v-for="day in days"
       :key="day.date"
@@ -60,7 +60,8 @@ function chipTime(chip: EnrichedChip): string {
       <!-- Column header -->
       <div
         :class="[
-          'text-center py-2 rounded-xl',
+          'py-2 rounded-xl',
+          'flex sm:flex-col flex-row items-center sm:text-center gap-2 sm:gap-0 px-3 sm:px-0',
           day.date === today ? 'bg-rose-500 shadow-lg shadow-rose-500/30' : 'bg-[var(--surface-2)]',
         ]"
       >
@@ -77,7 +78,7 @@ function chipTime(chip: EnrichedChip): string {
 
       <!-- Chips column -->
       <div
-        class="flex flex-col gap-1 min-h-48 bg-[var(--surface)] rounded-xl border border-[var(--border)] p-1.5 cursor-pointer hover:border-[var(--border-md)] hover:bg-[var(--surface-2)] transition-all group"
+        class="flex flex-col gap-1 min-h-16 sm:min-h-48 bg-[var(--surface)] rounded-xl border border-[var(--border)] p-1.5 sm:cursor-pointer hover:border-[var(--border-md)] hover:bg-[var(--surface-2)] transition-all group"
         @click="emit('dayClick', day.date)"
       >
         <BaseChipPill
