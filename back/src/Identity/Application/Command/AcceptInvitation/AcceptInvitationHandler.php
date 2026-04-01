@@ -59,6 +59,7 @@ final readonly class AcceptInvitationHandler
             email: $invitation->inviteeEmail(),
             hashedPassword: $hashedPassword,
             role: Role::PET_SITTER,
+            username: $command->username,
         );
 
         $this->userRepository->save($user);

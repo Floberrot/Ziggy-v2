@@ -14,6 +14,9 @@ final readonly class AcceptInvitationRequest
         #[Assert\NotBlank]
         #[Assert\Length(min: 8)]
         public string $password,
+        #[Assert\NotBlank]
+        #[Assert\Length(min: 2, max: 50)]
+        public string $username,
     ) {
     }
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { catsApi } from '../../api/cats'
 import { invitationsApi, type SendInvitationRequest } from '../../api/invitations'
@@ -11,9 +11,11 @@ import BaseModal from '../molecules/BaseModal.vue'
 import InvitationRow from '../organisms/InvitationRow.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
 import { useAuthStore } from '../../stores/useAuthStore'
+import { useUiStore } from '../../stores/useUiStore'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 const queryClient = useQueryClient()
 
 const { data: invitations, isPending, isError } = useQuery({
@@ -37,6 +39,12 @@ const form = ref<SendInvitationRequest>({ inviteeEmail: '', catId: '' })
 const formError = ref<string | null>(null)
 const successToken = ref<string | null>(null)
 
+watch(cats, (newCats) => {
+  if (newCats?.length && !form.value.catId) {
+    form.value.catId = newCats[0].id
+  }
+}, { immediate: true })
+
 function openInvite(): void {
   form.value = { inviteeEmail: '', catId: cats.value?.[0]?.id ?? '' }
   formError.value = null
@@ -59,7 +67,13 @@ const { mutate: sendInvitation, isPending: sending } = useMutation({
 
 const { mutate: revokeInvitation } = useMutation({
   mutationFn: (id: string) => invitationsApi.revoke(id),
-  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['invitations'] }),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['invitations'] })
+    uiStore.addNotification('Invitation revoked.', 'success')
+  },
+  onError: (err) => {
+    uiStore.addNotification(err instanceof Error ? err.message : 'Failed to revoke invitation.', 'error')
+  },
 })
 
 function handleSubmit(): void {
@@ -79,12 +93,16 @@ function handleRevoke(invitation: Invitation): void {
 
 function copyInvitationLink(invitation: Invitation): void {
   const url = `${window.location.origin}/invitation/accept?token=${invitation.token}`
-  void navigator.clipboard.writeText(url)
+  void navigator.clipboard.writeText(url).then(() => {
+    uiStore.addNotification('Link copied to clipboard.', 'info')
+  })
 }
 
 function copyTokenAndClose(): void {
   if (successToken.value) {
-    void navigator.clipboard.writeText(`${window.location.origin}/invitation/accept?token=${successToken.value}`)
+    void navigator.clipboard.writeText(`${window.location.origin}/invitation/accept?token=${successToken.value}`).then(() => {
+      uiStore.addNotification('Link copied to clipboard.', 'info')
+    })
   }
   closeModal()
 }

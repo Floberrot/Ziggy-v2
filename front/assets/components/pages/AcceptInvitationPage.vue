@@ -10,12 +10,13 @@ const route = useRoute()
 const router = useRouter()
 
 const token = computed(() => String(route.query.token ?? ''))
+const username = ref('')
 const password = ref('')
 const passwordConfirm = ref('')
 const errorMessage = ref<string | null>(null)
 
 const { mutate, isPending } = useMutation({
-  mutationFn: () => authApi.acceptInvitation({ token: token.value, password: password.value }),
+  mutationFn: () => authApi.acceptInvitation({ token: token.value, password: password.value, username: username.value }),
   onSuccess: async () => {
     await router.push('/login?invited=1')
   },
@@ -26,6 +27,11 @@ function handleSubmit(): void {
 
   if (!token.value) {
     errorMessage.value = 'Invalid or missing invitation token.'
+    return
+  }
+
+  if (username.value.length < 2) {
+    errorMessage.value = 'Username must be at least 2 characters.'
     return
   }
 
@@ -56,6 +62,12 @@ function handleSubmit(): void {
     :error="errorMessage ?? undefined"
     @submit="handleSubmit"
   >
+    <BaseInput
+      v-model="username"
+      label="Username"
+      placeholder="Choose a username"
+      :disabled="isPending"
+    />
     <BaseInput
       v-model="password"
       type="password"

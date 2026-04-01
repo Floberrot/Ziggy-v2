@@ -22,10 +22,11 @@ use Symfony\Component\Routing\Attribute\Route;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['email', 'password'],
+            required: ['email', 'password', 'username'],
             properties: [
                 new OA\Property(property: 'email', type: 'string', format: 'email', example: 'owner@example.com'),
                 new OA\Property(property: 'password', type: 'string', minLength: 8, example: 'secret1234'),
+                new OA\Property(property: 'username', type: 'string', minLength: 2, maxLength: 50, example: 'johndoe'),
             ]
         )
     ),
@@ -50,6 +51,7 @@ final readonly class RegisterOwnerController
         $this->commandBus->dispatch(new RegisterOwnerCommand(
             email: $request->email,
             plainPassword: $request->password,
+            username: $request->username,
         ));
 
         return new JsonResponse(null, Response::HTTP_CREATED);

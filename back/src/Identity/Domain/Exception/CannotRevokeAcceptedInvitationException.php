@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Identity\Domain\Exception;
 
-final class CannotRevokeAcceptedInvitationException extends \DomainException
+use App\Shared\Domain\Exception\BusinessRuleException;
+
+final class CannotRevokeAcceptedInvitationException extends BusinessRuleException
 {
     public function __construct()
     {

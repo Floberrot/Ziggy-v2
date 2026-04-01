@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Identity\Domain\Exception;
 
-final class ResetTokenAlreadyUsedException extends \DomainException
+use App\Shared\Domain\Exception\BusinessRuleException;
+
+final class ResetTokenAlreadyUsedException extends BusinessRuleException
 {
     public function __construct()
     {

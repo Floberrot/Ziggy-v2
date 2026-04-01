@@ -22,10 +22,11 @@ use Symfony\Component\Routing\Attribute\Route;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['token', 'password'],
+            required: ['token', 'password', 'username'],
             properties: [
                 new OA\Property(property: 'token', type: 'string', description: 'Invitation token from email'),
                 new OA\Property(property: 'password', type: 'string', minLength: 8),
+                new OA\Property(property: 'username', type: 'string', minLength: 2, maxLength: 50, example: 'johndoe'),
             ]
         )
     ),
@@ -47,7 +48,7 @@ final readonly class AcceptInvitationController
 
     public function __invoke(#[MapRequestPayload] AcceptInvitationRequest $request): JsonResponse
     {
-        $this->commandBus->dispatch(new AcceptInvitationCommand($request->token, $request->password));
+        $this->commandBus->dispatch(new AcceptInvitationCommand($request->token, $request->password, $request->username));
 
         return new JsonResponse(null, Response::HTTP_CREATED);
     }

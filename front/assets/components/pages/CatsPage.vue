@@ -11,9 +11,11 @@ import BaseModal from '../molecules/BaseModal.vue'
 import CatCard from '../organisms/CatCard.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
 import { useAuthStore } from '../../stores/useAuthStore'
+import { useUiStore } from '../../stores/useUiStore'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 const queryClient = useQueryClient()
 
 const { data: cats, isPending, isError } = useQuery({
@@ -65,6 +67,7 @@ const { mutate: createCat, isPending: creating } = useMutation({
   mutationFn: (data: CreateCatRequest) => catsApi.create(data),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['cats'] })
+    uiStore.addNotification('Cat created successfully.', 'success')
     closeModal()
   },
   onError: (err) => {
@@ -76,6 +79,7 @@ const { mutate: updateCat, isPending: updating } = useMutation({
   mutationFn: ({ id, data }: { id: string; data: CreateCatRequest }) => catsApi.update(id, data),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['cats'] })
+    uiStore.addNotification('Cat updated successfully.', 'success')
     closeModal()
   },
   onError: (err) => {
@@ -85,7 +89,13 @@ const { mutate: updateCat, isPending: updating } = useMutation({
 
 const { mutate: deleteCat } = useMutation({
   mutationFn: (id: string) => catsApi.remove(id),
-  onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cats'] }),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['cats'] })
+    uiStore.addNotification('Cat deleted.', 'success')
+  },
+  onError: (err) => {
+    uiStore.addNotification(err instanceof Error ? err.message : 'Failed to delete cat.', 'error')
+  },
 })
 
 function handleSubmit(): void {

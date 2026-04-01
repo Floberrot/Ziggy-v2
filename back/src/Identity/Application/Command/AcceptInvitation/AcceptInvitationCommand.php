@@ -13,6 +13,7 @@ final readonly class AcceptInvitationCommand
         public string $token,
         #[SensitiveParameter]
         public string $plainPassword,
+        public string $username,
     ) {
     }
 }

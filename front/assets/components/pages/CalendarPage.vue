@@ -7,6 +7,7 @@ import { catsApi } from '../../api/cats'
 import { chipTypesApi } from '../../api/chipTypes'
 import type { EnrichedChip } from '../../types'
 import { useAuthStore } from '../../stores/useAuthStore'
+import { useUiStore } from '../../stores/useUiStore'
 import BaseButton from '../atoms/BaseButton.vue'
 import BaseModal from '../molecules/BaseModal.vue'
 import CalendarMonthView from '../organisms/CalendarMonthView.vue'
@@ -16,6 +17,7 @@ import MainTemplate from '../templates/MainTemplate.vue'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 const queryClient = useQueryClient()
 
 const catId = computed(() => String(route.params.catId))
@@ -132,6 +134,7 @@ const { mutate: placeChip, isPending: placing } = useMutation({
   mutationFn: (data: PlaceChipRequest) => calendarApi.placeChip(catId.value, data),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['calendar', catId] })
+    uiStore.addNotification('Chip added to calendar.', 'success')
     showPlaceModal.value = false
   },
   onError: (err) => {
@@ -162,8 +165,12 @@ const { mutate: removeChip, isPending: removing } = useMutation({
   mutationFn: (chipId: string) => calendarApi.removeChip(catId.value, chipId),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['calendar', catId] })
+    uiStore.addNotification('Chip removed.', 'success')
     showChipModal.value = false
     selectedChip.value = null
+  },
+  onError: (err) => {
+    uiStore.addNotification(err instanceof Error ? err.message : 'Failed to remove chip.', 'error')
   },
 })
 

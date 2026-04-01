@@ -9,12 +9,13 @@ import AuthForm from '../molecules/AuthForm.vue'
 const router = useRouter()
 
 const email = ref('')
+const username = ref('')
 const password = ref('')
 const passwordConfirm = ref('')
 const errorMessage = ref<string | null>(null)
 
 const { mutate, isPending } = useMutation({
-  mutationFn: () => authApi.register({ email: email.value, password: password.value }),
+  mutationFn: () => authApi.register({ email: email.value, password: password.value, username: username.value }),
   onSuccess: async () => {
     await router.push('/login?registered=1')
   },
@@ -22,6 +23,11 @@ const { mutate, isPending } = useMutation({
 
 function handleSubmit(): void {
   errorMessage.value = null
+
+  if (username.value.length < 2) {
+    errorMessage.value = 'Username must be at least 2 characters.'
+    return
+  }
 
   if (password.value !== passwordConfirm.value) {
     errorMessage.value = 'Passwords do not match.'
@@ -55,6 +61,12 @@ function handleSubmit(): void {
       type="email"
       label="Email"
       placeholder="you@example.com"
+      :disabled="isPending"
+    />
+    <BaseInput
+      v-model="username"
+      label="Username"
+      placeholder="Choose a username"
       :disabled="isPending"
     />
     <BaseInput

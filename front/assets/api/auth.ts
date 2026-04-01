@@ -8,6 +8,7 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string
   password: string
+  username: string
 }
 
 export interface AuthResponse {
@@ -24,6 +25,7 @@ export interface MeResponse {
 export interface AcceptInvitationRequest {
   token: string
   password: string
+  username: string
 }
 
 export interface RequestPasswordResetRequest {

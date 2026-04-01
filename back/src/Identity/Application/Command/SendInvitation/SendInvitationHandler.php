@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Identity\Application\Command\SendInvitation;
 
+use App\Identity\Application\Port\InvitationMailer;
 use App\Identity\Domain\Exception\OwnerNotFoundException;
 use App\Identity\Domain\Model\Email;
 use App\Identity\Domain\Model\Invitation;
@@ -18,6 +19,7 @@ final readonly class SendInvitationHandler
     public function __construct(
         private UserRepository $userRepository,
         private InvitationRepository $invitationRepository,
+        private InvitationMailer $invitationMailer,
     ) {
     }
 
@@ -37,6 +39,7 @@ final readonly class SendInvitationHandler
         );
 
         $this->invitationRepository->save($invitation);
+        $this->invitationMailer->sendInvitation($command->inviteeEmail, $invitation->token());
 
         return $invitation->token();
     }
