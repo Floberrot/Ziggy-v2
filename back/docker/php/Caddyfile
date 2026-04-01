@@ -7,7 +7,16 @@
     root * /app/public
     encode zstd br gzip
 
-    php_server {
-        resolve_root_symlink
+    # API routes → Symfony PHP
+    handle /api/* {
+        php_server {
+            resolve_root_symlink
+        }
+    }
+
+    # All other routes → Vue SPA (try static file, fallback to index.html)
+    handle {
+        try_files {path} /build/index.html
+        file_server
     }
 }
