@@ -1,0 +1,56 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# Caddyfile — VPN-only variant
+#
+# - Listens on the WireGuard interface IP (10.8.0.1) only.
+# - HTTP only: WireGuard already encrypts the tunnel end-to-end,
+#   so a second TLS layer is unnecessary and avoids cert complexity.
+# - No auto_https, no Let's Encrypt — the app is never public.
+# ══════════════════════════════════════════════════════════════════════════════
+{
+    frankenphp
+    auto_https off
+    admin off
+}
+
+http://10.8.0.1 {
+    root * /app/public
+    encode zstd br gzip
+
+    # ── Security headers ────────────────────────────────────────────────────
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options        "SAMEORIGIN"
+        X-XSS-Protection       "1; mode=block"
+        Referrer-Policy        "strict-origin-when-cross-origin"
+        -Server
+        -X-Powered-By
+    }
+
+    # ── API routes → Symfony PHP ────────────────────────────────────────────
+    handle /api/* {
+        php_server {
+            resolve_root_symlink
+        }
+    }
+
+    # ── Health-check endpoint ───────────────────────────────────────────────
+    handle /health {
+        respond "OK" 200
+    }
+
+    # ── All other routes → Vue SPA ──────────────────────────────────────────
+    handle {
+        try_files {path} /build/index.html
+        file_server
+    }
+
+    # ── Logging ─────────────────────────────────────────────────────────────
+    log {
+        output file /var/log/caddy/access.log {
+            roll_size     50MiB
+            roll_keep     7
+            roll_keep_for 168h
+        }
+        format json
+    }
+}
