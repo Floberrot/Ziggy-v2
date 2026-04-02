@@ -1,5 +1,7 @@
 # Ziggy — Project Guide
 
+ALWAYS COMMIT WITH ONLY ME AS AUTHOR
+
 Stack: **Symfony UX · Vue 3 · FrankenPHP · Docker**
 
 ## Global Rules
