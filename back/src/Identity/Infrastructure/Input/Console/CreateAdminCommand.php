@@ -47,9 +47,8 @@ final class CreateAdminCommand extends Command
         $emailArg = $input->getArgument('email');
         /** @var string $passwordArg */
         $passwordArg = $input->getArgument('password');
-        /** @var string|null $usernameArg */
+        /** @var string $usernameArg */
         $usernameArg = $input->getArgument('username');
-        $username = $usernameArg ?? strstr($emailArg, '@', true) ?: $emailArg;
 
         try {
             $email = new Email($emailArg);
@@ -77,7 +76,7 @@ final class CreateAdminCommand extends Command
             email: $email,
             hashedPassword: $hashedPassword,
             role: Role::ADMIN,
-            username: $username,
+            username: $usernameArg,
         );
 
         $this->userRepository->save($admin);

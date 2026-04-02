@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Identity\Infrastructure\Input\Http;
 
 use App\Identity\Application\Command\AcceptInvitation\AcceptInvitationCommand;
+use App\Identity\Application\Command\AcceptInvitation\AcceptInvitationResult;
+use App\Identity\Application\Port\TokenGenerator;
 use App\Identity\Infrastructure\Input\Http\Request\AcceptInvitationRequest;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[OA\Tag(name: 'Auth')]
@@ -42,16 +45,29 @@ use Symfony\Component\Routing\Attribute\Route;
 )]
 final readonly class AcceptInvitationController
 {
-    public function __construct(private MessageBusInterface $commandBus)
-    {
+    public function __construct(
+        private MessageBusInterface $commandBus,
+        private TokenGenerator $tokenGenerator,
+    ) {
     }
 
     public function __invoke(#[MapRequestPayload] AcceptInvitationRequest $request): JsonResponse
     {
+        $envelope = $this->commandBus->dispatch(
+            new AcceptInvitationCommand($request->token, $request->password, $request->username),
+        );
+
+        /** @var HandledStamp $stamp */
+        $stamp = $envelope->last(HandledStamp::class);
         $this->commandBus->dispatch(
             new AcceptInvitationCommand($request->token, $request->password, $request->username)
         );
 
-        return new JsonResponse(null, Response::HTTP_CREATED);
+        /** @var AcceptInvitationResult $result */
+        $result = $stamp->getResult();
+
+        $token = $this->tokenGenerator->generateForEmail($result->email);
+
+        return new JsonResponse(['token' => $token], Response::HTTP_CREATED);
     }
 }

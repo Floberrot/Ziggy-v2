@@ -24,7 +24,7 @@ final class User extends AggregateRoot
         Email $email,
         string $hashedPassword,
         Role $role,
-        string $username,
+        ?string $username,
     ): self {
         $user = new self(
             id: $id,
