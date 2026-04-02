@@ -70,12 +70,13 @@ final readonly class DoctrineUserRepository implements UserRepository
 
     private function toDomain(UserOrmEntity $entity): User
     {
-        return User::register(
+        return User::reconstitute(
             id: new UserId($entity->getId()),
             email: new Email($entity->getEmail()),
             hashedPassword: $entity->getPassword(),
             role: Role::from($entity->getRole()),
             username: $entity->getUsername(),
+            createdAt: $entity->getCreatedAt(),
         );
     }
 }

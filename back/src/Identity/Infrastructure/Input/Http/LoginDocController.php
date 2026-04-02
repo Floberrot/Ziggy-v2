@@ -18,7 +18,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[OA\Post(
     path: '/api/auth/login',
     summary: 'Obtain a JWT token',
-    description: 'Authenticate with email and password. Returns a JWT token to use as `Authorization: Bearer <token>` on all protected endpoints.',
+    description: 'Authenticate with email and password.'
+        . ' Returns a JWT token to use as `Authorization: Bearer <token>` on all protected endpoints.',
     security: [],
     requestBody: new OA\RequestBody(
         required: true,
@@ -35,7 +36,13 @@ use Symfony\Component\Routing\Attribute\Route;
             response: 200,
             description: 'JWT token issued',
             content: new OA\JsonContent(
-                properties: [new OA\Property(property: 'token', type: 'string', example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...')]
+                properties: [
+                    new OA\Property(
+                        property: 'token',
+                        type: 'string',
+                        example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...'
+                    ),
+                ]
             )
         ),
         new OA\Response(response: 401, description: 'Invalid credentials'),

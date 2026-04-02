@@ -20,9 +20,15 @@ use Symfony\Component\Routing\Attribute\Route;
 #[OA\Post(
     path: '/api/cats/{catId}/chips',
     summary: 'Place a chip on a cat\'s calendar',
-    description: 'Places a chip (task token) on a specific day of a cat\'s calendar. Creates the calendar automatically if it does not yet exist.',
+    description: 'Places a chip (task token) on a specific day of a cat\'s calendar.'
+        . ' Creates the calendar automatically if it does not yet exist.',
     parameters: [
-        new OA\Parameter(name: 'catId', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),
+        new OA\Parameter(
+            name: 'catId',
+            in: 'path',
+            required: true,
+            schema: new OA\Schema(type: 'string', format: 'uuid')
+        ),
     ],
     requestBody: new OA\RequestBody(
         required: true,
