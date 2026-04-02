@@ -8,6 +8,9 @@ public/build/
 /.env.local
 /.env.local.php
 /.env.*.local
+/.env.dev
+/.env.docker
+/.env.prod
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
