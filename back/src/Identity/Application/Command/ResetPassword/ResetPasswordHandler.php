@@ -43,7 +43,7 @@ final readonly class ResetPasswordHandler
         $user = $this->userRepository->findByEmail($resetToken->email());
 
         if (null === $user) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException($resetToken->email()->value());
         }
 
         $hashedPassword = $this->passwordHasher->hashPassword(

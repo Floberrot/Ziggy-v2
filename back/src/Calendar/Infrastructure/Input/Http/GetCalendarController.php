@@ -20,7 +20,12 @@ use Symfony\Component\Routing\Attribute\Route;
     summary: 'Get the calendar for a cat',
     description: 'Returns the full calendar with all chips placed on it for a given cat.',
     parameters: [
-        new OA\Parameter(name: 'catId', in: 'path', required: true, schema: new OA\Schema(type: 'string', format: 'uuid')),
+        new OA\Parameter(
+            name: 'catId',
+            in: 'path',
+            required: true,
+            schema: new OA\Schema(type: 'string', format: 'uuid')
+        ),
     ],
     responses: [
         new OA\Response(
@@ -37,7 +42,12 @@ use Symfony\Component\Routing\Attribute\Route;
                             properties: [
                                 new OA\Property(property: 'id', type: 'string', format: 'uuid'),
                                 new OA\Property(property: 'chipTypeId', type: 'string', format: 'uuid'),
-                                new OA\Property(property: 'date', type: 'string', format: 'date', example: '2026-03-28'),
+                                new OA\Property(
+                                    property: 'date',
+                                    type: 'string',
+                                    format: 'date',
+                                    example: '2026-03-28'
+                                ),
                                 new OA\Property(property: 'note', type: 'string', nullable: true),
                             ]
                         )

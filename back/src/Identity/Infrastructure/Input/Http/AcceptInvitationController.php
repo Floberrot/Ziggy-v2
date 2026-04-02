@@ -48,7 +48,9 @@ final readonly class AcceptInvitationController
 
     public function __invoke(#[MapRequestPayload] AcceptInvitationRequest $request): JsonResponse
     {
-        $this->commandBus->dispatch(new AcceptInvitationCommand($request->token, $request->password, $request->username));
+        $this->commandBus->dispatch(
+            new AcceptInvitationCommand($request->token, $request->password, $request->username)
+        );
 
         return new JsonResponse(null, Response::HTTP_CREATED);
     }

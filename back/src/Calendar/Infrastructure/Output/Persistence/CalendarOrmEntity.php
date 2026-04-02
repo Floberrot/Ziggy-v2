@@ -23,7 +23,12 @@ class CalendarOrmEntity
     private \DateTimeImmutable $createdAt;
 
     /** @var Collection<int, ChipOrmEntity> */
-    #[ORM\OneToMany(targetEntity: ChipOrmEntity::class, mappedBy: 'calendar', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(
+        targetEntity: ChipOrmEntity::class,
+        mappedBy: 'calendar',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
     private Collection $chips;
 
     public function __construct()

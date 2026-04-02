@@ -10,6 +10,8 @@
 
     <rule ref="PSR12"/>
 
+    <exclude-pattern>src/DataFixtures/</exclude-pattern>
+
     <rule ref="Generic.Files.LineLength">
         <properties>
             <property name="lineLimit" value="120"/>
