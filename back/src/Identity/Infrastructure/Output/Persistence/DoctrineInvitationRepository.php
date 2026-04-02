@@ -31,6 +31,7 @@ final readonly class DoctrineInvitationRepository implements InvitationRepositor
         $entity->setToken($invitation->token());
         $entity->setExpiresAt($invitation->expiresAt());
         $entity->setAccepted($invitation->isAccepted());
+        $entity->setDeclined($invitation->isDeclined());
 
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
@@ -79,6 +80,31 @@ final readonly class DoctrineInvitationRepository implements InvitationRepositor
         }
     }
 
+    public function markDeclined(string $token): void
+    {
+        $entity = $this->entityManager->getRepository(InvitationOrmEntity::class)
+            ->findOneBy(['token' => $token]);
+
+        if (null !== $entity) {
+            $entity->setDeclined(true);
+            $this->entityManager->flush();
+        }
+    }
+
+    /** @return list<Invitation> */
+    public function findPendingByOwnerAndEmail(string $ownerId, string $inviteeEmail): array
+    {
+        $entities = $this->entityManager->getRepository(InvitationOrmEntity::class)
+            ->findBy([
+                'ownerId' => $ownerId,
+                'inviteeEmail' => $inviteeEmail,
+                'accepted' => false,
+                'declined' => false,
+            ]);
+
+        return array_map($this->toDomain(...), $entities);
+    }
+
     public function remove(string $id): void
     {
         $entity = $this->entityManager->find(InvitationOrmEntity::class, $id);
@@ -99,6 +125,7 @@ final readonly class DoctrineInvitationRepository implements InvitationRepositor
             token: $entity->getToken(),
             expiresAt: $entity->getExpiresAt(),
             accepted: $entity->isAccepted(),
+            declined: $entity->isDeclined(),
         );
     }
 }

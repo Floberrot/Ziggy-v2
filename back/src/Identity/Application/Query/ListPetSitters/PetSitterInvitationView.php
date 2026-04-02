@@ -2,16 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Identity\Application\Query\ListInvitations;
+namespace App\Identity\Application\Query\ListPetSitters;
 
-final readonly class InvitationView
+final readonly class PetSitterInvitationView
 {
     public function __construct(
         public string $id,
-        public string $inviteeEmail,
         public string $catId,
         public string $token,
-        public string $expiresAt,
         public bool $accepted,
         public bool $declined,
         public bool $expired,
@@ -23,10 +21,8 @@ final readonly class InvitationView
     {
         return [
             'id' => $this->id,
-            'inviteeEmail' => $this->inviteeEmail,
             'catId' => $this->catId,
             'token' => $this->token,
-            'expiresAt' => $this->expiresAt,
             'accepted' => $this->accepted,
             'declined' => $this->declined,
             'expired' => $this->expired,

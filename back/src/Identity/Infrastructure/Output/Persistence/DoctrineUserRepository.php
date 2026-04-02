@@ -75,7 +75,7 @@ final readonly class DoctrineUserRepository implements UserRepository
             email: new Email($entity->getEmail()),
             hashedPassword: $entity->getPassword(),
             role: Role::from($entity->getRole()),
-            username: $entity->getUsername(),
+            username: $entity->getUsername() ?? '',
         );
     }
 }

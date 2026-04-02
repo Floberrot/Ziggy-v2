@@ -63,6 +63,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../components/pages/ProfilePage.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/cats/:catId/calendar',
       name: 'calendar',
       component: () => import('../components/pages/CalendarPage.vue'),

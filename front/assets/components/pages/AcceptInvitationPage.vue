@@ -3,6 +3,8 @@ import { useMutation } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { authApi } from '../../api/auth'
+import { invitationsApi } from '../../api/invitations'
+import BaseButton from '../atoms/BaseButton.vue'
 import BaseInput from '../atoms/BaseInput.vue'
 import AuthForm from '../molecules/AuthForm.vue'
 
@@ -19,6 +21,16 @@ const { mutate, isPending } = useMutation({
   mutationFn: () => authApi.acceptInvitation({ token: token.value, password: password.value, username: username.value }),
   onSuccess: async () => {
     await router.push('/login?invited=1')
+  },
+})
+
+const { mutate: decline, isPending: declining } = useMutation({
+  mutationFn: () => invitationsApi.decline(token.value),
+  onSuccess: async () => {
+    await router.push('/login?declined=1')
+  },
+  onError: (err) => {
+    errorMessage.value = err instanceof Error ? err.message : 'Could not decline invitation.'
   },
 })
 
@@ -50,6 +62,14 @@ function handleSubmit(): void {
       errorMessage.value = err instanceof Error ? err.message : 'Could not accept invitation.'
     },
   })
+}
+
+function handleDecline(): void {
+  if (!token.value) {
+    errorMessage.value = 'Invalid or missing invitation token.'
+    return
+  }
+  decline()
 }
 </script>
 
@@ -84,10 +104,23 @@ function handleSubmit(): void {
     />
 
     <template #footer>
-      Already have an account?
-      <RouterLink to="/login" class="text-rose-400 font-semibold hover:text-rose-300 hover:underline">
-        Sign in
-      </RouterLink>
+      <div class="flex flex-col items-center gap-3">
+        <div>
+          Already have an account?
+          <RouterLink to="/login" class="text-rose-400 font-semibold hover:text-rose-300 hover:underline">
+            Sign in
+          </RouterLink>
+        </div>
+        <BaseButton
+          type="button"
+          variant="ghost"
+          size="sm"
+          :loading="declining"
+          @click="handleDecline"
+        >
+          Decline invitation
+        </BaseButton>
+      </div>
     </template>
   </AuthForm>
 </template>

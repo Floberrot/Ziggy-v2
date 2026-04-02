@@ -73,6 +73,7 @@ final class CreateAdminCommand extends Command
             email: $email,
             hashedPassword: $hashedPassword,
             role: Role::ADMIN,
+            username: '',
         );
 
         $this->userRepository->save($admin);

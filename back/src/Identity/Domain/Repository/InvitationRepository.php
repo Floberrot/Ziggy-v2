@@ -19,5 +19,10 @@ interface InvitationRepository
 
     public function markAccepted(string $token): void;
 
+    public function markDeclined(string $token): void;
+
+    /** @return list<Invitation> */
+    public function findPendingByOwnerAndEmail(string $ownerId, string $inviteeEmail): array;
+
     public function remove(string $id): void;
 }

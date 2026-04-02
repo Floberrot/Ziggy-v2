@@ -10,4 +10,5 @@ export const invitationsApi = {
   list: () => apiClient.get<Invitation[]>('/invitations'),
   send: (data: SendInvitationRequest) => apiClient.post<{ token: string }>('/invitations', data),
   revoke: (id: string) => apiClient.delete<void>(`/invitations/${id}`),
+  decline: (token: string) => apiClient.post<void>('/auth/invitation/decline', { token }),
 }

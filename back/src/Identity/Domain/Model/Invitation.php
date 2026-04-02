@@ -4,17 +4,25 @@ declare(strict_types=1);
 
 namespace App\Identity\Domain\Model;
 
-final readonly class Invitation
+use App\Identity\Domain\Exception\InvitationAlreadyAcceptedException;
+use App\Identity\Domain\Exception\InvitationAlreadyDeclinedException;
+use App\Identity\Domain\Exception\InvitationExpiredException;
+
+final class Invitation
 {
+    private bool $declined;
+
     public function __construct(
-        private string $id,
-        private UserId $ownerId,
-        private Email $inviteeEmail,
-        private string $catId,
-        private string $token,
-        private \DateTimeImmutable $expiresAt,
-        private bool $accepted,
+        private readonly string $id,
+        private readonly UserId $ownerId,
+        private readonly Email $inviteeEmail,
+        private readonly string $catId,
+        private readonly string $token,
+        private readonly \DateTimeImmutable $expiresAt,
+        private readonly bool $accepted,
+        bool $declined,
     ) {
+        $this->declined = $declined;
     }
 
     public static function create(
@@ -31,6 +39,7 @@ final readonly class Invitation
             token: bin2hex(random_bytes(32)),
             expiresAt: new \DateTimeImmutable('+7 days'),
             accepted: false,
+            declined: false,
         );
     }
 
@@ -42,6 +51,7 @@ final readonly class Invitation
         string $token,
         \DateTimeImmutable $expiresAt,
         bool $accepted,
+        bool $declined,
     ): self {
         return new self(
             id: $id,
@@ -51,7 +61,25 @@ final readonly class Invitation
             token: $token,
             expiresAt: $expiresAt,
             accepted: $accepted,
+            declined: $declined,
         );
+    }
+
+    public function decline(): void
+    {
+        if ($this->accepted) {
+            throw new InvitationAlreadyAcceptedException();
+        }
+
+        if ($this->isExpired()) {
+            throw new InvitationExpiredException();
+        }
+
+        if ($this->declined) {
+            throw new InvitationAlreadyDeclinedException();
+        }
+
+        $this->declined = true;
     }
 
     public function id(): string
@@ -87,6 +115,11 @@ final readonly class Invitation
     public function isAccepted(): bool
     {
         return $this->accepted;
+    }
+
+    public function isDeclined(): bool
+    {
+        return $this->declined;
     }
 
     public function isExpired(): bool

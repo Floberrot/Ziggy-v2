@@ -39,6 +39,12 @@ const sections = [
     description: 'Invite helpers to care for your cats.',
     href: '/pet-sitters',
   },
+  {
+    emoji: '👤',
+    title: 'My Profile',
+    description: 'View your stats and update personal info.',
+    href: '/profile',
+  },
 ]
 </script>
 

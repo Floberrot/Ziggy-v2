@@ -23,7 +23,39 @@ export interface Invitation {
   token: string
   expiresAt: string
   accepted: boolean
+  declined: boolean
   expired: boolean
+}
+
+export type PetSitterType = 'family' | 'friend' | 'professional'
+
+export interface PetSitterInvitationItem {
+  id: string
+  catId: string
+  token: string
+  accepted: boolean
+  declined: boolean
+  expired: boolean
+}
+
+export interface PetSitter {
+  id: string
+  inviteeEmail: string
+  userId: string | null
+  type: PetSitterType
+  age: number | null
+  phoneNumber: string | null
+  invitations: PetSitterInvitationItem[]
+}
+
+export interface OwnerProfile {
+  userId: string
+  email: string
+  username: string | null
+  age: number | null
+  phoneNumber: string | null
+  catsCount: number
+  chipsCount: number
 }
 
 export interface Chip {

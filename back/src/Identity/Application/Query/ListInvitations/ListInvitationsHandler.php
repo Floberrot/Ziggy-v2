@@ -37,6 +37,7 @@ final readonly class ListInvitationsHandler
                 token: $inv->token(),
                 expiresAt: $inv->expiresAt()->format(\DateTimeInterface::ATOM),
                 accepted: $inv->isAccepted(),
+                declined: $inv->isDeclined(),
                 expired: $inv->isExpired(),
             ),
             $invitations,

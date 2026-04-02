@@ -32,6 +32,9 @@ class InvitationOrmEntity
     #[ORM\Column(type: 'boolean')]
     private bool $accepted = false;
 
+    #[ORM\Column(type: 'boolean')]
+    private bool $declined = false;
+
     public function getId(): string
     {
         return $this->id;
@@ -87,5 +90,15 @@ class InvitationOrmEntity
     public function setAccepted(bool $accepted): void
     {
         $this->accepted = $accepted;
+    }
+
+    public function isDeclined(): bool
+    {
+        return $this->declined;
+    }
+
+    public function setDeclined(bool $declined): void
+    {
+        $this->declined = $declined;
     }
 }

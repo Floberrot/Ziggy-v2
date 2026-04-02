@@ -12,6 +12,7 @@ use App\Identity\Domain\Model\Role;
 use App\Identity\Domain\Model\User;
 use App\Identity\Domain\Model\UserId;
 use App\Identity\Domain\Repository\InvitationRepository;
+use App\Identity\Domain\Repository\PetSitterRepository;
 use App\Identity\Domain\Repository\UserRepository;
 use App\Shared\Domain\EventBus;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -24,6 +25,7 @@ final readonly class AcceptInvitationHandler
     public function __construct(
         private InvitationRepository $invitationRepository,
         private UserRepository $userRepository,
+        private PetSitterRepository $petSitterRepository,
         private EventBus $eventBus,
         private UserPasswordHasherInterface $passwordHasher,
     ) {
@@ -64,6 +66,17 @@ final readonly class AcceptInvitationHandler
 
         $this->userRepository->save($user);
         $this->invitationRepository->markAccepted($invitation->token());
+
+        $petSitter = $this->petSitterRepository->findByOwnerAndEmail(
+            $invitation->ownerId()->value(),
+            $invitation->inviteeEmail()->value(),
+        );
+
+        if (null !== $petSitter) {
+            $petSitter->linkUser($user->id());
+            $this->petSitterRepository->save($petSitter);
+        }
+
         $this->eventBus->publish(...$user->pullDomainEvents());
     }
 }
