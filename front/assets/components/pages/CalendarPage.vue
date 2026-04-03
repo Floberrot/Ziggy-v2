@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { calendarApi, type PlaceChipRequest } from '../../api/calendar'
 import { catsApi } from '../../api/cats'
 import { chipTypesApi } from '../../api/chipTypes'
 import type { EnrichedChip } from '../../types'
-import { useAuthStore } from '../../stores/useAuthStore'
+import { useLogout } from '../../composables/useLogout'
 import { useUiStore } from '../../stores/useUiStore'
 import BaseButton from '../atoms/BaseButton.vue'
 import BaseModal from '../molecules/BaseModal.vue'
@@ -15,9 +15,8 @@ import CalendarWeekView from '../organisms/CalendarWeekView.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
 
 const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
 const uiStore = useUiStore()
+const { logout } = useLogout()
 const queryClient = useQueryClient()
 
 const catId = computed(() => String(route.params.catId))
@@ -174,10 +173,7 @@ const { mutate: removeChip, isPending: removing } = useMutation({
   },
 })
 
-async function logout(): Promise<void> {
-  authStore.logout()
-  await router.push('/login')
-}
+
 </script>
 
 <template>

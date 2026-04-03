@@ -10,12 +10,12 @@ import BaseInput from '../atoms/BaseInput.vue'
 import BaseModal from '../molecules/BaseModal.vue'
 import CatCard from '../organisms/CatCard.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
-import { useAuthStore } from '../../stores/useAuthStore'
+import { useLogout } from '../../composables/useLogout'
 import { useUiStore } from '../../stores/useUiStore'
 
 const router = useRouter()
-const authStore = useAuthStore()
 const uiStore = useUiStore()
+const { logout } = useLogout()
 const queryClient = useQueryClient()
 
 const { data: cats, isPending, isError } = useQuery({
@@ -125,10 +125,7 @@ function handleDelete(cat: Cat): void {
   }
 }
 
-async function logout(): Promise<void> {
-  authStore.logout()
-  await router.push('/login')
-}
+
 </script>
 
 <template>

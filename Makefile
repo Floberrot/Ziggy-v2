@@ -115,6 +115,10 @@ db-reset: ## Drop, create and migrate the database (⚠ destroys data)
 	$(APP) php bin/console doctrine:database:create
 	$(APP) php bin/console doctrine:migrations:migrate --no-interaction
 
+.PHONY: fixtures
+fixtures:
+	$(APP) php bin/console d:f:l
+
 # ──────────────────────────────────────────────
 #  FRONTEND
 # ──────────────────────────────────────────────

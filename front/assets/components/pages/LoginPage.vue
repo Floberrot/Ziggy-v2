@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useMutation } from '@tanstack/vue-query'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { authApi } from '../../api/auth'
@@ -10,6 +10,7 @@ import AuthForm from '../molecules/AuthForm.vue'
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+const queryClient = useQueryClient()
 
 const email = ref('')
 const password = ref('')
@@ -24,6 +25,7 @@ const successMessage = computed(() => {
 const { mutate, isPending, error } = useMutation({
   mutationFn: () => authApi.login({ email: email.value, password: password.value }),
   onSuccess: async (data) => {
+    queryClient.clear()
     authStore.setToken(data.token)
     const me = await authApi.me()
     authStore.setUser(me)

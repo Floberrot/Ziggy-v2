@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
-import { useRouter } from 'vue-router'
-import { authApi } from '../../api/auth'
+import { authApi, type MeResponse } from '../../api/auth'
 import { useAuthStore } from '../../stores/useAuthStore'
+import { useLogout } from '../../composables/useLogout'
 import BaseButton from '../atoms/BaseButton.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
 
-const router = useRouter()
 const authStore = useAuthStore()
+const { logout } = useLogout()
 
 const { data: me } = useQuery({
   queryKey: ['me'],
@@ -15,37 +16,42 @@ const { data: me } = useQuery({
   enabled: authStore.isAuthenticated,
 })
 
-async function logout(): Promise<void> {
-  authStore.logout()
-  await router.push('/login')
-}
-
-const sections = [
+const sections: { emoji: string; title: string; description: string; href: string; roles: MeResponse['role'][] }[] = [
   {
     emoji: '🐾',
     title: 'My Cats',
     description: 'Add and manage your cats.',
     href: '/cats',
+    roles: ['ROLE_OWNER', 'ROLE_PET_SITTER', 'ROLE_ADMIN'],
   },
   {
     emoji: '🎨',
     title: 'Chip Types',
     description: 'Create labels for your calendar.',
     href: '/chip-types',
+    roles: ['ROLE_OWNER', 'ROLE_ADMIN'],
   },
   {
     emoji: '✉️',
     title: 'Pet Sitters',
     description: 'Invite helpers to care for your cats.',
     href: '/pet-sitters',
+    roles: ['ROLE_OWNER', 'ROLE_ADMIN'],
   },
   {
     emoji: '👤',
     title: 'My Profile',
     description: 'View your stats and update personal info.',
     href: '/profile',
+    roles: ['ROLE_OWNER', 'ROLE_ADMIN'],
   },
 ]
+
+const visibleSections = computed(() => {
+  const role = me.value?.role
+  if (!role) return []
+  return sections.filter(s => s.roles.includes(role))
+})
 </script>
 
 <template>
@@ -70,7 +76,7 @@ const sections = [
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <RouterLink
-          v-for="section in sections"
+          v-for="section in visibleSections"
           :key="section.href"
           :to="section.href"
           class="group bg-[var(--surface)] rounded-2xl p-6 border border-[var(--border)] hover:border-rose-500/30 hover:bg-[var(--surface-2)] hover:shadow-lg hover:shadow-rose-500/5 transition-all duration-200 cursor-pointer"

@@ -1,7 +1,7 @@
 const BASE_URL = '/api'
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = localStorage.getItem('jwt_token')
+  const token = sessionStorage.getItem('jwt_token')
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),

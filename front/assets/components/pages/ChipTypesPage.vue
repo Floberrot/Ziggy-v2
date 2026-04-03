@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { chipTypesApi, type CreateChipTypeRequest } from '../../api/chipTypes'
 import type { ChipType } from '../../types'
 import BaseButton from '../atoms/BaseButton.vue'
@@ -10,12 +9,11 @@ import BaseInput from '../atoms/BaseInput.vue'
 import BaseModal from '../molecules/BaseModal.vue'
 import ChipTypeRow from '../organisms/ChipTypeRow.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
-import { useAuthStore } from '../../stores/useAuthStore'
+import { useLogout } from '../../composables/useLogout'
 import { useUiStore } from '../../stores/useUiStore'
 
-const router = useRouter()
-const authStore = useAuthStore()
 const uiStore = useUiStore()
+const { logout } = useLogout()
 const queryClient = useQueryClient()
 
 const { data: chipTypes, isPending, isError } = useQuery({
@@ -143,10 +141,7 @@ function handleDelete(chipType: ChipType): void {
   }
 }
 
-async function logout(): Promise<void> {
-  authStore.logout()
-  await router.push('/login')
-}
+
 </script>
 
 <template>

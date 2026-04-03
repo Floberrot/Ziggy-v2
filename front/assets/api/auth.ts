@@ -18,7 +18,7 @@ export interface AuthResponse {
 export interface MeResponse {
   id: string
   email: string
-  role: string
+  role: 'ROLE_OWNER' | 'ROLE_PET_SITTER' | 'ROLE_ADMIN'
   username: string | null
 }
 

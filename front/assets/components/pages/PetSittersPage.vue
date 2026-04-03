@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { authApi } from '../../api/auth'
 import { catsApi } from '../../api/cats'
 import { petSittersApi, type CreatePetSitterRequest, type UpdatePetSitterRequest } from '../../api/petSitters'
-import { useAuthStore } from '../../stores/useAuthStore'
 import { useUiStore } from '../../stores/useUiStore'
 import type { PetSitter, PetSitterType } from '../../types'
 import BaseButton from '../atoms/BaseButton.vue'
@@ -13,10 +11,14 @@ import BaseInput from '../atoms/BaseInput.vue'
 import BaseModal from '../molecules/BaseModal.vue'
 import PetSitterRow from '../organisms/PetSitterRow.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
+import {useRouter} from "vue-router";
+import {useAuthStore} from "@/stores/useAuthStore";
+import {useLogout} from "@/composables/useLogout";
 
 const router = useRouter()
 const authStore = useAuthStore()
 const uiStore = useUiStore()
+const { logout } = useLogout()
 const queryClient = useQueryClient()
 
 const { data: me } = useQuery({
@@ -165,10 +167,6 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
   { value: 'professional', label: 'Professional' },
 ]
 
-async function logout(): Promise<void> {
-  authStore.logout()
-  await router.push('/login')
-}
 </script>
 
 <template>
