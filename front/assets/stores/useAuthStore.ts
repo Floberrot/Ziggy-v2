@@ -11,9 +11,9 @@ interface AuthUser {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref<string | null>(localStorage.getItem(TOKEN_KEY))
+  const token = ref<string | null>(sessionStorage.getItem(TOKEN_KEY))
   const expiry = ref<number | null>(
-    localStorage.getItem(EXPIRY_KEY) ? Number(localStorage.getItem(EXPIRY_KEY)) : null,
+    sessionStorage.getItem(EXPIRY_KEY) ? Number(sessionStorage.getItem(EXPIRY_KEY)) : null,
   )
   const user = ref<AuthUser | null>(null)
 
@@ -26,8 +26,8 @@ export const useAuthStore = defineStore('auth', () => {
     const expiresAt = Date.now() + 3600 * 1000
     token.value = newToken
     expiry.value = expiresAt
-    localStorage.setItem(TOKEN_KEY, newToken)
-    localStorage.setItem(EXPIRY_KEY, String(expiresAt))
+    sessionStorage.setItem(TOKEN_KEY, newToken)
+    sessionStorage.setItem(EXPIRY_KEY, String(expiresAt))
   }
 
   function setUser(authUser: AuthUser): void {
@@ -38,8 +38,8 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
     expiry.value = null
     user.value = null
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(EXPIRY_KEY)
+    sessionStorage.removeItem(TOKEN_KEY)
+    sessionStorage.removeItem(EXPIRY_KEY)
   }
 
   return {

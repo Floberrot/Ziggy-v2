@@ -24,7 +24,7 @@ final class User extends AggregateRoot
         Email $email,
         string $hashedPassword,
         Role $role,
-        string $username,
+        ?string $username,
     ): self {
         $user = new self(
             id: $id,
@@ -43,6 +43,24 @@ final class User extends AggregateRoot
         ));
 
         return $user;
+    }
+
+    public static function reconstitute(
+        UserId $id,
+        Email $email,
+        string $hashedPassword,
+        Role $role,
+        ?string $username,
+        \DateTimeImmutable $createdAt,
+    ): self {
+        return new self(
+            id: $id,
+            email: $email,
+            hashedPassword: $hashedPassword,
+            role: $role,
+            username: $username,
+            createdAt: $createdAt,
+        );
     }
 
     public function id(): UserId

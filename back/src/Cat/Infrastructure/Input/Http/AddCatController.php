@@ -28,7 +28,12 @@ use Symfony\Component\Routing\Attribute\Route;
                 new OA\Property(property: 'name', type: 'string', example: 'Mochi'),
                 new OA\Property(property: 'weight', type: 'number', format: 'float', nullable: true, example: 4.2),
                 new OA\Property(property: 'breed', type: 'string', nullable: true, example: 'Maine Coon'),
-                new OA\Property(property: 'colors', type: 'array', items: new OA\Items(type: 'string'), example: ['orange', 'white']),
+                new OA\Property(
+                    property: 'colors',
+                    type: 'array',
+                    items: new OA\Items(type: 'string'),
+                    example: ['orange', 'white']
+                ),
             ]
         )
     ),

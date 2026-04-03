@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Identity\Infrastructure\Input\Http;
 
 use App\Identity\Application\Command\RegisterOwner\RegisterOwnerCommand;
+use App\Identity\Application\Port\TokenGenerator;
 use App\Identity\Infrastructure\Input\Http\Request\RegisterOwnerRequest;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -42,8 +43,10 @@ use Symfony\Component\Routing\Attribute\Route;
 )]
 final readonly class RegisterOwnerController
 {
-    public function __construct(private MessageBusInterface $commandBus)
-    {
+    public function __construct(
+        private MessageBusInterface $commandBus,
+        private TokenGenerator $tokenGenerator,
+    ) {
     }
 
     public function __invoke(#[MapRequestPayload] RegisterOwnerRequest $request): JsonResponse
@@ -54,6 +57,8 @@ final readonly class RegisterOwnerController
             username: $request->username,
         ));
 
-        return new JsonResponse(null, Response::HTTP_CREATED);
+        $token = $this->tokenGenerator->generateForEmail($request->email);
+
+        return new JsonResponse(['token' => $token], Response::HTTP_CREATED);
     }
 }

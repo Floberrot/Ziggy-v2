@@ -35,7 +35,8 @@ final class CreateAdminCommand extends Command
     {
         $this
             ->addArgument('email', InputArgument::REQUIRED, 'Admin email')
-            ->addArgument('password', InputArgument::REQUIRED, 'Admin plain password');
+            ->addArgument('password', InputArgument::REQUIRED, 'Admin plain password')
+            ->addArgument('username', InputArgument::OPTIONAL, 'Admin username (defaults to email local part)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -46,6 +47,8 @@ final class CreateAdminCommand extends Command
         $emailArg = $input->getArgument('email');
         /** @var string $passwordArg */
         $passwordArg = $input->getArgument('password');
+        /** @var string $usernameArg */
+        $usernameArg = $input->getArgument('username');
 
         try {
             $email = new Email($emailArg);
@@ -73,7 +76,7 @@ final class CreateAdminCommand extends Command
             email: $email,
             hashedPassword: $hashedPassword,
             role: Role::ADMIN,
-            username: '',
+            username: $usernameArg,
         );
 
         $this->userRepository->save($admin);

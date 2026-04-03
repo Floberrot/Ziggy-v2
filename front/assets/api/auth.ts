@@ -42,13 +42,13 @@ export const authApi = {
     apiClient.post<AuthResponse>('/auth/login', data),
 
   register: (data: RegisterRequest) =>
-    apiClient.post<void>('/auth/register', data),
+    apiClient.post<AuthResponse>('/auth/register', data),
 
   me: () =>
     apiClient.get<MeResponse>('/auth/me'),
 
   acceptInvitation: (data: AcceptInvitationRequest) =>
-    apiClient.post<void>('/auth/invitation/accept', data),
+    apiClient.post<AuthResponse>('/auth/invitation/accept', data),
 
   requestPasswordReset: (data: RequestPasswordResetRequest) =>
     apiClient.post<{ message: string }>('/auth/password-reset/request', data),
