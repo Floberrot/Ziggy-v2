@@ -34,7 +34,9 @@ services:
       - ./front:/app
       - front_node_modules:/app/node_modules
     ports:
-      - "5173:5173"
+      - "5173:80"
+    environment:
+      - BACKEND_URL=http://app
     networks:
       - ziggy
     depends_on:
