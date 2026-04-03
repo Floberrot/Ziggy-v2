@@ -29,7 +29,7 @@ final readonly class AcceptInvitationHandler
     ) {
     }
 
-    public function __invoke(AcceptInvitationCommand $command): void
+    public function __invoke(AcceptInvitationCommand $command): AcceptInvitationResult
     {
         $invitation = $this->invitationRepository->findByToken($command->token);
 
@@ -65,5 +65,7 @@ final readonly class AcceptInvitationHandler
         $this->userRepository->save($user);
         $this->invitationRepository->markAccepted($invitation->token());
         $this->eventBus->publish(...$user->pullDomainEvents());
+
+        return new AcceptInvitationResult($invitation->inviteeEmail()->value());
     }
 }

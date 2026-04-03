@@ -3,11 +3,13 @@ import { useMutation } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { authApi } from '../../api/auth'
+import { useAuthStore } from '../../stores/useAuthStore'
 import BaseInput from '../atoms/BaseInput.vue'
 import AuthForm from '../molecules/AuthForm.vue'
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 const token = computed(() => String(route.query.token ?? ''))
 const username = ref('')
@@ -17,8 +19,12 @@ const errorMessage = ref<string | null>(null)
 
 const { mutate, isPending } = useMutation({
   mutationFn: () => authApi.acceptInvitation({ token: token.value, password: password.value, username: username.value }),
-  onSuccess: async () => {
-    await router.push('/login?invited=1')
+  onSuccess: async (data) => {
+    authStore.logout()
+    authStore.setToken(data.token)
+    const me = await authApi.me()
+    authStore.setUser(me)
+    await router.push('/dashboard')
   },
 })
 

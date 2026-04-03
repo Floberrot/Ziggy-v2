@@ -3,10 +3,12 @@ import { useMutation } from '@tanstack/vue-query'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { authApi } from '../../api/auth'
+import { useAuthStore } from '../../stores/useAuthStore'
 import BaseInput from '../atoms/BaseInput.vue'
 import AuthForm from '../molecules/AuthForm.vue'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const email = ref('')
 const username = ref('')
@@ -16,8 +18,11 @@ const errorMessage = ref<string | null>(null)
 
 const { mutate, isPending } = useMutation({
   mutationFn: () => authApi.register({ email: email.value, password: password.value, username: username.value }),
-  onSuccess: async () => {
-    await router.push('/login?registered=1')
+  onSuccess: async (data) => {
+    authStore.setToken(data.token)
+    const me = await authApi.me()
+    authStore.setUser(me)
+    await router.push('/dashboard')
   },
 })
 
