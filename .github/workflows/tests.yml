@@ -61,7 +61,7 @@ jobs:
       - name: Run migrations on test database
         env:
           DATABASE_URL: postgresql://ziggy:ziggy@127.0.0.1:5432/ziggy_test?serverVersion=16&charset=utf8
-        run: php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --env=test
+        run: php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
 
       - name: Run PHPUnit
         env:
