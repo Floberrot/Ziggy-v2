@@ -61,7 +61,7 @@ abstract class AuthenticatedWebTestCase extends WebTestCase
         return self::$testEmail;
     }
 
-    protected static function tearDownAfterClass(): void
+    public static function tearDownAfterClass(): void
     {
         self::$cachedToken = null;
         self::$cachedUserId = null;
