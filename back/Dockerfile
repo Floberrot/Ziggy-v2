@@ -38,6 +38,11 @@ COPY . .
 
 RUN composer install --no-dev --no-interaction --optimize-autoloader --classmap-authoritative
 
+ARG JWT_PASSPHRASE
+RUN mkdir -p config/jwt && \
+    openssl genrsa -passout pass:${JWT_PASSPHRASE} -out config/jwt/private.pem 4096 && \
+    openssl rsa -pubout -passin pass:${JWT_PASSPHRASE} -in config/jwt/private.pem -out config/jwt/public.pem
+
 COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 

@@ -3,7 +3,10 @@
   "build": {
     "builder": "DOCKERFILE",
     "dockerfilePath": "Dockerfile",
-    "dockerBuildTarget": "prod"
+    "dockerBuildTarget": "prod",
+    "buildArgs": {
+      "JWT_PASSPHRASE": "${{JWT_PASSPHRASE}}"
+    }
   },
   "deploy": {
     "healthcheckPath": "/api/health",
