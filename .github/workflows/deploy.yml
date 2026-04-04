@@ -1,0 +1,74 @@
+name: Deploy to Railway
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-back:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy backend service
+        run: |
+          railway up \
+            --project "${{ vars.RAILWAY_PROJECT_ID }}" \
+            --service "${{ vars.RAILWAY_SERVICE_BACK }}" \
+            --environment production \
+            --ci \
+            -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        working-directory: back
+
+  deploy-worker:
+    name: Deploy Worker
+    runs-on: ubuntu-latest
+    environment: production
+    needs: deploy-back
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy worker service
+        run: |
+          railway up \
+            --project "${{ vars.RAILWAY_PROJECT_ID }}" \
+            --service "${{ vars.RAILWAY_SERVICE_WORKER }}" \
+            --environment production \
+            --ci \
+            -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        working-directory: back
+
+  deploy-front:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy frontend service
+        run: |
+          railway up \
+            --project "${{ vars.RAILWAY_PROJECT_ID }}" \
+            --service "${{ vars.RAILWAY_SERVICE_FRONT }}" \
+            --environment production \
+            --ci \
+            -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        working-directory: front
