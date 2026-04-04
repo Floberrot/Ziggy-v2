@@ -7,6 +7,8 @@ on:
 
 env:
   RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
+  RAILWAY_ENVIRONMENT_ID: ${{ vars.RAILWAY_ENVIRONMENT_ID }}
 
 jobs:
   deploy-back:
@@ -22,8 +24,6 @@ jobs:
       - name: Deploy backend service
         run: |
           railway up \
-            --project "${{ vars.RAILWAY_PROJECT_ID }}" \
-            --environment production \
             --service ziggy-back \
             --ci \
             -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
@@ -43,8 +43,6 @@ jobs:
       - name: Deploy worker service
         run: |
           railway up \
-            --project "${{ vars.RAILWAY_PROJECT_ID }}" \
-            --environment production \
             --service ziggy-worker \
             --ci \
             -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
@@ -63,8 +61,6 @@ jobs:
       - name: Deploy frontend service
         run: |
           railway up \
-            --project "${{ vars.RAILWAY_PROJECT_ID }}" \
-            --environment production \
             --service ziggy-front \
             --ci \
             -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
