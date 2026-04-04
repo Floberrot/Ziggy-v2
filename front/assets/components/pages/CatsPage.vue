@@ -15,14 +15,14 @@ const uiStore = useUiStore()
 const queryClient = useQueryClient()
 
 const CAT_COLOR_PRESETS = [
-  '#E07A3A', // ginger
-  '#1C1C1C', // black
-  '#9B9B9B', // grey
-  '#F5F0E8', // white/cream
-  '#D4955A', // calico
-  '#8B6340', // tabby brown
-  '#7BA0C0', // blue-grey
-  '#C0A0C8', // lilac
+  '#E07A3A',
+  '#1C1C1C',
+  '#9B9B9B',
+  '#F5F0E8',
+  '#D4955A',
+  '#8B6340',
+  '#7BA0C0',
+  '#C0A0C8',
 ]
 
 const { data: cats, isPending, isError } = useQuery({
@@ -30,11 +30,8 @@ const { data: cats, isPending, isError } = useQuery({
   queryFn: () => catsApi.list(),
 })
 
-// Modal state
 const showModal = ref(false)
-const editingCat = ref<Cat | null>(null)
 
-// Form state
 const form = ref<CreateCatRequest & { color: string }>({
   name: '',
   breed: null,
@@ -46,28 +43,13 @@ const form = ref<CreateCatRequest & { color: string }>({
 const formError = ref<string | null>(null)
 
 function openCreate(): void {
-  editingCat.value = null
   form.value = { name: '', breed: null, weight: null, colors: [], color: '#ff9eb0' }
-  formError.value = null
-  showModal.value = true
-}
-
-function openEdit(cat: Cat): void {
-  editingCat.value = cat
-  form.value = {
-    name: cat.name,
-    breed: cat.breed,
-    weight: cat.weight,
-    colors: [...cat.colors],
-    color: cat.colors[0] ?? '#ff9eb0',
-  }
   formError.value = null
   showModal.value = true
 }
 
 function closeModal(): void {
   showModal.value = false
-  editingCat.value = null
 }
 
 const { mutate: createCat, isPending: creating } = useMutation({
@@ -79,18 +61,6 @@ const { mutate: createCat, isPending: creating } = useMutation({
   },
   onError: (err) => {
     formError.value = err instanceof Error ? err.message : 'Failed to create cat.'
-  },
-})
-
-const { mutate: updateCat, isPending: updating } = useMutation({
-  mutationFn: ({ id, data }: { id: string; data: CreateCatRequest }) => catsApi.update(id, data),
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['cats'] })
-    uiStore.addNotification('Cat updated successfully.', 'success')
-    closeModal()
-  },
-  onError: (err) => {
-    formError.value = err instanceof Error ? err.message : 'Failed to update cat.'
   },
 })
 
@@ -119,11 +89,7 @@ function handleSubmit(): void {
     return
   }
 
-  if (editingCat.value) {
-    updateCat({ id: editingCat.value.id, data: payload })
-  } else {
-    createCat(payload)
-  }
+  createCat(payload)
 }
 
 function handleDelete(cat: Cat): void {
@@ -131,8 +97,6 @@ function handleDelete(cat: Cat): void {
     deleteCat(cat.id)
   }
 }
-
-
 </script>
 
 <template>
@@ -156,7 +120,6 @@ function handleDelete(cat: Cat): void {
           v-for="cat in cats"
           :key="cat.id"
           :cat="cat"
-          @edit="openEdit"
           @delete="handleDelete"
         />
       </div>
@@ -164,7 +127,7 @@ function handleDelete(cat: Cat): void {
 
     <BaseModal
       :open="showModal"
-      :title="editingCat ? 'Edit cat' : 'Add a cat'"
+      title="Add a cat"
       @close="closeModal"
     >
       <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
@@ -183,9 +146,7 @@ function handleDelete(cat: Cat): void {
         <BaseColorPicker v-model="form.color" label="Color" :presets="CAT_COLOR_PRESETS" />
         <div class="flex justify-end gap-3 pt-2">
           <BaseButton type="button" variant="secondary" @click="closeModal">Cancel</BaseButton>
-          <BaseButton type="submit" variant="primary" :loading="creating || updating">
-            {{ editingCat ? 'Save changes' : 'Add cat' }}
-          </BaseButton>
+          <BaseButton type="submit" variant="primary" :loading="creating">Add cat</BaseButton>
         </div>
       </form>
     </BaseModal>

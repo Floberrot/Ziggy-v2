@@ -69,6 +69,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/cats/:catId/edit',
+      name: 'cat-edit',
+      component: () => import('../components/pages/CatEditPage.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/cats/:catId/calendar',
       redirect: (to) => ({ path: '/dashboard', query: { cat: String(to.params.catId) } }),
     },

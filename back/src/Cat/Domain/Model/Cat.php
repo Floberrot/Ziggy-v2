@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Cat\Domain\Model;
 
 use App\Cat\Domain\Event\CatAdded;
+use App\Cat\Domain\Event\CatUpdated;
 use App\Shared\Domain\AggregateRoot;
 
 final class Cat extends AggregateRoot
@@ -86,24 +87,20 @@ final class Cat extends AggregateRoot
         return $this->createdAt;
     }
 
-    public function rename(CatName $name): void
+    /** @param list<string> $colors */
+    public function update(CatName $name, ?float $weight, ?string $breed, array $colors): void
     {
         $this->name = $name;
-    }
-
-    public function updateWeight(?float $weight): void
-    {
         $this->weight = $weight;
-    }
-
-    public function updateBreed(?string $breed): void
-    {
         $this->breed = $breed;
-    }
-
-    /** @param list<string> $colors */
-    public function updateColors(array $colors): void
-    {
         $this->colors = $colors;
+
+        $this->recordEvent(new CatUpdated(
+            catId: $this->id->value(),
+            name: $name->value(),
+            weight: $weight,
+            ownerId: $this->ownerId,
+            occurredAt: new \DateTimeImmutable(),
+        ));
     }
 }

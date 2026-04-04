@@ -8,7 +8,6 @@ const props = defineProps<{
 }>()
 
 defineEmits<{
-  edit: [cat: Cat]
   delete: [cat: Cat]
 }>()
 
@@ -16,6 +15,10 @@ const router = useRouter()
 
 function openCalendar(): void {
   void router.push({ path: '/dashboard', query: { cat: props.cat.id } })
+}
+
+function openEdit(): void {
+  void router.push(`/cats/${props.cat.id}/edit`)
 }
 </script>
 
@@ -54,7 +57,7 @@ function openCalendar(): void {
         Open calendar
       </span>
       <div class="flex gap-2" @click.stop>
-        <BaseButton variant="secondary" size="sm" @click="$emit('edit', cat)">Edit</BaseButton>
+        <BaseButton variant="secondary" size="sm" @click="openEdit">Edit</BaseButton>
         <BaseButton variant="danger" size="sm" @click="$emit('delete', cat)">Delete</BaseButton>
       </div>
     </div>

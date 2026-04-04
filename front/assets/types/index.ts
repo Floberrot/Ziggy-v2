@@ -89,3 +89,8 @@ export interface EnrichedChip extends Chip {
 export interface ApiError {
   error: string
 }
+
+export interface WeightEntry {
+  weight: number
+  recordedAt: string
+}

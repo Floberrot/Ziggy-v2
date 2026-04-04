@@ -1,4 +1,4 @@
-import type { Cat } from '../types'
+import type { Cat, WeightEntry } from '../types'
 import { apiClient } from './client'
 
 export interface CreateCatRequest {
@@ -21,4 +21,5 @@ export const catsApi = {
   create: (data: CreateCatRequest) => apiClient.post<{ id: string }>('/cats', data),
   update: (id: string, data: UpdateCatRequest) => apiClient.put<void>(`/cats/${id}`, data),
   remove: (id: string) => apiClient.delete<void>(`/cats/${id}`),
+  weightHistory: (id: string) => apiClient.get<WeightEntry[]>(`/cats/${id}/weight-history`),
 }
