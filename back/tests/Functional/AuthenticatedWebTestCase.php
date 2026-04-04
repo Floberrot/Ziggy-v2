@@ -15,6 +15,13 @@ abstract class AuthenticatedWebTestCase extends WebTestCase
     private static string $testPassword = 'FunctionalPass1!';
     private static string $testUsername = 'functionalowner';
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        self::$cachedToken = null;
+        self::$cachedUserId = null;
+    }
+
     protected function createAuthenticatedClient(): KernelBrowser
     {
         $client = static::createClient();

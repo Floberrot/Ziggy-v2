@@ -30,7 +30,7 @@ final class PlaceChipHandlerTest extends KernelTestCase
         ($this->handler)(new PlaceChipCommand(
             catId: $catId,
             chipTypeId: 'chiptype-abc',
-            date: '2026-03-01',
+            dateTime: '2026-03-01',
             authorId: 'author-xyz',
             note: 'Integration test chip',
         ));
@@ -50,14 +50,14 @@ final class PlaceChipHandlerTest extends KernelTestCase
         ($this->handler)(new PlaceChipCommand(
             catId: $catId,
             chipTypeId: 'chiptype-1',
-            date: '2026-03-01',
+            dateTime: '2026-03-01',
             authorId: 'author-xyz',
         ));
 
         ($this->handler)(new PlaceChipCommand(
             catId: $catId,
             chipTypeId: 'chiptype-2',
-            date: '2026-03-02',
+            dateTime: '2026-03-02',
             authorId: 'author-xyz',
         ));
 

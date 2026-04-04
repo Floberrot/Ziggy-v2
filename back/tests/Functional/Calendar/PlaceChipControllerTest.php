@@ -34,7 +34,7 @@ final class PlaceChipControllerTest extends AuthenticatedWebTestCase
             ['CONTENT_TYPE' => 'application/json'],
             json_encode([
                 'chipTypeId' => '00000000-0000-0000-0000-000000000001',
-                'date' => '2026-03-15',
+                'dateTime' => '2026-03-15T00:00:00+00:00',
                 'note' => 'Test chip',
             ], JSON_THROW_ON_ERROR)
         );
@@ -70,7 +70,7 @@ final class PlaceChipControllerTest extends AuthenticatedWebTestCase
             ['CONTENT_TYPE' => 'application/json'],
             json_encode([
                 'chipTypeId' => '00000000-0000-0000-0000-000000000001',
-                'date' => '2026-03-15',
+                'dateTime' => '2026-03-15T00:00:00+00:00',
             ], JSON_THROW_ON_ERROR)
         );
 

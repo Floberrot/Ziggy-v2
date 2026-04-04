@@ -12,7 +12,8 @@ final readonly class PlaceChipRequest
         #[Assert\NotBlank]
         public string $chipTypeId,
         #[Assert\NotBlank]
-        public string $date,
+        #[Assert\DateTime(format: \DateTimeInterface::ATOM)]
+        public string $dateTime,
         public ?string $note = null,
     ) {
     }
