@@ -49,6 +49,7 @@ const catNameMap = computed(() => {
 
 const showModal = ref(false)
 const editingPetSitter = ref<PetSitter | null>(null)
+const createError = ref<string | null>(null)
 
 const createForm = ref<CreatePetSitterRequest>({
   inviteeEmail: '',
@@ -79,6 +80,7 @@ function openCreate(): void {
     age: null,
     phoneNumber: null,
   }
+  createError.value = null
   showModal.value = true
 }
 
@@ -105,7 +107,7 @@ const { mutate: createPetSitter, isPending: creating } = useMutation({
     closeModal()
   },
   onError: (err) => {
-    uiStore.addNotification(err instanceof Error ? err.message : 'Failed to add pet sitter.', 'error')
+    createError.value = err instanceof Error ? err.message : 'Failed to add pet sitter.'
   },
 })
 
@@ -216,7 +218,13 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
           </select>
         </div>
         <BaseInput v-model.number="editForm.age" type="number" label="Age" placeholder="Optional" />
-        <BaseInput v-model="editForm.phoneNumber" label="Phone number" placeholder="Optional" />
+        <BaseInput
+          v-model="editForm.phoneNumber"
+          type="tel"
+          label="Phone number"
+          placeholder="Optional"
+          @update:model-value="editForm.phoneNumber = $event ? $event.replace(/[^\d\s+\-().]/g, '') : null"
+        />
         <div class="flex justify-end gap-3 pt-2">
           <BaseButton type="button" variant="secondary" @click="closeModal">Cancel</BaseButton>
           <BaseButton type="submit" variant="primary" :loading="updating">Save changes</BaseButton>
@@ -228,6 +236,9 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
         class="flex flex-col gap-4"
         @submit.prevent="handleCreate"
       >
+        <div v-if="createError" class="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400">
+          {{ createError }}
+        </div>
         <BaseInput v-model="createForm.inviteeEmail" type="email" label="Pet sitter email *" placeholder="petsitter@example.com" />
         <div class="flex flex-col gap-1.5">
           <label class="text-sm font-medium text-[var(--text-2)]">Cat *</label>
@@ -249,7 +260,13 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
           </select>
         </div>
         <BaseInput v-model.number="createForm.age" type="number" label="Age" placeholder="Optional" />
-        <BaseInput v-model="createForm.phoneNumber" label="Phone number" placeholder="Optional" />
+        <BaseInput
+          v-model="createForm.phoneNumber"
+          type="tel"
+          label="Phone number"
+          placeholder="Optional"
+          @update:model-value="createForm.phoneNumber = $event ? $event.replace(/[^\d\s+\-().]/g, '') : null"
+        />
         <div class="flex justify-end gap-3 pt-2">
           <BaseButton type="button" variant="secondary" @click="closeModal">Cancel</BaseButton>
           <BaseButton type="submit" variant="primary" :loading="creating">Add pet sitter</BaseButton>

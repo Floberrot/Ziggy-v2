@@ -102,8 +102,10 @@ function handleSubmit(): void {
           />
           <BaseInput
             v-model="form.phoneNumber"
+            type="tel"
             label="Phone number"
             placeholder="+1 234 567 890"
+            @update:model-value="form.phoneNumber = $event ? $event.replace(/[^\d\s+\-().]/g, '') : null"
           />
           <div class="flex justify-end">
             <BaseButton type="submit" variant="primary" :loading="saving">Save</BaseButton>
