@@ -10,6 +10,8 @@ services:
 
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/DataFixtures/'
 
     # Bind buses by name
     App\Identity\Application\Command\RegisterOwner\RegisterOwnerHandler:
