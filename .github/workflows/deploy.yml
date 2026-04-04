@@ -7,8 +7,6 @@ on:
 
 env:
   RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-  RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
-  RAILWAY_ENVIRONMENT_ID: ${{ vars.RAILWAY_ENVIRONMENT_ID }}
 
 jobs:
   deploy-back:
@@ -22,10 +20,12 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy backend service
-        run: railway up --ci -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
+        run: |
+          railway up \
+            --service "${{ vars.RAILWAY_SERVICE_BACK_ID }}" \
+            --ci \
+            -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
         working-directory: back
-        env:
-          RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_BACK_ID }}
 
   deploy-worker:
     name: Deploy Worker
@@ -39,10 +39,12 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy worker service
-        run: railway up --ci -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
+        run: |
+          railway up \
+            --service "${{ vars.RAILWAY_SERVICE_WORKER_ID }}" \
+            --ci \
+            -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
         working-directory: back
-        env:
-          RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_WORKER_ID }}
 
   deploy-front:
     name: Deploy Frontend
@@ -55,7 +57,9 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy frontend service
-        run: railway up --ci -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
+        run: |
+          railway up \
+            --service "${{ vars.RAILWAY_SERVICE_FRONT_ID }}" \
+            --ci \
+            -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
         working-directory: front
-        env:
-          RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_FRONT_ID }}
