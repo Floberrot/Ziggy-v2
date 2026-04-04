@@ -22,7 +22,9 @@ jobs:
       - name: Deploy backend service
         run: |
           railway up \
-            --service "${{ vars.RAILWAY_SERVICE_BACK_ID }}" \
+            --project "${{ vars.RAILWAY_PROJECT_ID }}" \
+            --environment production \
+            --service ziggy-back \
             --ci \
             -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
         working-directory: back
@@ -41,7 +43,9 @@ jobs:
       - name: Deploy worker service
         run: |
           railway up \
-            --service "${{ vars.RAILWAY_SERVICE_WORKER_ID }}" \
+            --project "${{ vars.RAILWAY_PROJECT_ID }}" \
+            --environment production \
+            --service ziggy-worker \
             --ci \
             -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
         working-directory: back
@@ -59,7 +63,9 @@ jobs:
       - name: Deploy frontend service
         run: |
           railway up \
-            --service "${{ vars.RAILWAY_SERVICE_FRONT_ID }}" \
+            --project "${{ vars.RAILWAY_PROJECT_ID }}" \
+            --environment production \
+            --service ziggy-front \
             --ci \
             -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
         working-directory: front
