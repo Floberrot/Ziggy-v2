@@ -85,22 +85,6 @@ function chipName(id: string): string {
 
 <template>
   <MainTemplate>
-    <template #nav>
-      <template v-if="authStore.isAuthenticated">
-        <RouterLink to="/dashboard">
-          <BaseButton variant="primary" size="sm">My dashboard</BaseButton>
-        </RouterLink>
-      </template>
-      <template v-else>
-        <RouterLink to="/login">
-          <BaseButton variant="ghost" size="sm">Sign in</BaseButton>
-        </RouterLink>
-        <RouterLink to="/register">
-          <BaseButton variant="primary" size="sm">Get started</BaseButton>
-        </RouterLink>
-      </template>
-    </template>
-
     <!-- ── Hero ──────────────────────────────────────────────────────── -->
     <section class="relative overflow-hidden py-24 px-6">
       <!-- Ambient glows -->

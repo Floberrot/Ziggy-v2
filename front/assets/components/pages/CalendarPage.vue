@@ -6,7 +6,6 @@ import { calendarApi, type PlaceChipRequest } from '../../api/calendar'
 import { catsApi } from '../../api/cats'
 import { chipTypesApi } from '../../api/chipTypes'
 import type { EnrichedChip } from '../../types'
-import { useLogout } from '../../composables/useLogout'
 import { useUiStore } from '../../stores/useUiStore'
 import BaseButton from '../atoms/BaseButton.vue'
 import BaseModal from '../molecules/BaseModal.vue'
@@ -16,7 +15,6 @@ import MainTemplate from '../templates/MainTemplate.vue'
 
 const route = useRoute()
 const uiStore = useUiStore()
-const { logout } = useLogout()
 const queryClient = useQueryClient()
 
 const catId = computed(() => String(route.params.catId))
@@ -178,13 +176,6 @@ const { mutate: removeChip, isPending: removing } = useMutation({
 
 <template>
   <MainTemplate>
-    <template #nav>
-      <RouterLink to="/cats" class="text-sm text-[var(--text-2)] hover:text-[var(--text)]">My Cats</RouterLink>
-      <RouterLink to="/chip-types" class="text-sm text-[var(--text-2)] hover:text-[var(--text)]">Chip Types</RouterLink>
-      <RouterLink to="/pet-sitters" class="text-sm text-[var(--text-2)] hover:text-[var(--text)]">Pet Sitters</RouterLink>
-      <BaseButton variant="ghost" size="sm" @click="logout">Sign out</BaseButton>
-    </template>
-
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
       <!-- Page header -->
