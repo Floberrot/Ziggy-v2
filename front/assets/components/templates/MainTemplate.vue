@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import BaseThemeToggle from '../atoms/BaseThemeToggle.vue'
+import AppNav from '../organisms/AppNav.vue'
 
 const currentYear = computed(() => new Date().getFullYear())
 </script>
@@ -13,10 +13,7 @@ const currentYear = computed(() => new Date().getFullYear())
         <span class="text-2xl">🐱</span>
         <span class="text-lg font-bold tracking-tight text-rose-400">Ziggy</span>
       </RouterLink>
-      <nav class="flex items-center gap-3">
-        <slot name="nav" />
-        <BaseThemeToggle />
-      </nav>
+      <AppNav />
     </header>
 
     <main class="flex-1">

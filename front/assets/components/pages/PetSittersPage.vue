@@ -13,12 +13,10 @@ import PetSitterRow from '../organisms/PetSitterRow.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
 import {useRouter} from "vue-router";
 import {useAuthStore} from "@/stores/useAuthStore";
-import {useLogout} from "@/composables/useLogout";
 
 const router = useRouter()
 const authStore = useAuthStore()
 const uiStore = useUiStore()
-const { logout } = useLogout()
 const queryClient = useQueryClient()
 
 const { data: me } = useQuery({
@@ -171,11 +169,6 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
 
 <template>
   <MainTemplate>
-    <template #nav>
-      <RouterLink to="/dashboard" class="text-sm text-[var(--text-2)] hover:text-[var(--text)]">Dashboard</RouterLink>
-      <BaseButton variant="ghost" size="sm" @click="logout">Sign out</BaseButton>
-    </template>
-
     <div class="max-w-3xl mx-auto px-6 py-10">
       <div class="flex items-center justify-between mb-8">
         <div>

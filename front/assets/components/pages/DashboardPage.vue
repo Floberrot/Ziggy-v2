@@ -3,12 +3,9 @@ import { computed } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import { authApi, type MeResponse } from '../../api/auth'
 import { useAuthStore } from '../../stores/useAuthStore'
-import { useLogout } from '../../composables/useLogout'
-import BaseButton from '../atoms/BaseButton.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
 
 const authStore = useAuthStore()
-const { logout } = useLogout()
 
 const { data: me } = useQuery({
   queryKey: ['me'],
@@ -56,11 +53,6 @@ const visibleSections = computed(() => {
 
 <template>
   <MainTemplate>
-    <template #nav>
-      <span class="text-sm text-[var(--text-2)]">{{ me?.username ?? me?.email }}</span>
-      <BaseButton variant="ghost" size="sm" @click="logout">Sign out</BaseButton>
-    </template>
-
     <div class="max-w-4xl mx-auto px-6 py-12">
       <!-- Ambient -->
       <div class="pointer-events-none fixed inset-0 overflow-hidden -z-10">

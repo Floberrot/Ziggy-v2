@@ -10,12 +10,10 @@ import BaseInput from '../atoms/BaseInput.vue'
 import BaseModal from '../molecules/BaseModal.vue'
 import CatCard from '../organisms/CatCard.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
-import { useLogout } from '../../composables/useLogout'
 import { useUiStore } from '../../stores/useUiStore'
 
 const router = useRouter()
 const uiStore = useUiStore()
-const { logout } = useLogout()
 const queryClient = useQueryClient()
 
 const { data: cats, isPending, isError } = useQuery({
@@ -130,11 +128,6 @@ function handleDelete(cat: Cat): void {
 
 <template>
   <MainTemplate>
-    <template #nav>
-      <RouterLink to="/dashboard" class="text-sm text-[var(--text-2)] hover:text-[var(--text)]">Dashboard</RouterLink>
-      <BaseButton variant="ghost" size="sm" @click="logout">Sign out</BaseButton>
-    </template>
-
     <div class="max-w-4xl mx-auto px-6 py-10">
       <div class="flex items-center justify-between mb-8">
         <div>

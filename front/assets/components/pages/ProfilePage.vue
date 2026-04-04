@@ -55,20 +55,10 @@ const { mutate: saveProfile, isPending: saving } = useMutation({
 function handleSubmit(): void {
   saveProfile(form.value)
 }
-
-async function logout(): Promise<void> {
-  authStore.logout()
-  await router.push('/login')
-}
 </script>
 
 <template>
   <MainTemplate>
-    <template #nav>
-      <RouterLink to="/dashboard" class="text-sm text-[var(--text-2)] hover:text-[var(--text)]">Dashboard</RouterLink>
-      <BaseButton variant="ghost" size="sm" @click="logout">Sign out</BaseButton>
-    </template>
-
     <div class="max-w-2xl mx-auto px-6 py-10">
       <div class="mb-8">
         <h1 class="text-3xl font-bold text-[var(--text)]">My Profile 👤</h1>
