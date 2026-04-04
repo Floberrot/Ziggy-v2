@@ -9,7 +9,7 @@ final readonly class PlaceChipCommand
     public function __construct(
         public string $catId,
         public string $chipTypeId,
-        public string $date,
+        public string $dateTime,
         public string $authorId,
         public ?string $note = null,
     ) {

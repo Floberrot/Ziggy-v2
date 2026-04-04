@@ -117,12 +117,19 @@ function getMonday(d: Date): Date {
 
 const showPlaceModal = ref(false)
 const selectedDate = ref('')
-const placeForm = ref<PlaceChipRequest>({ chipTypeId: '', date: '', note: null })
+const placeTime = ref('')
+const placeForm = ref<{ chipTypeId: string; note: string | null }>({ chipTypeId: '', note: null })
 const placeError = ref<string | null>(null)
+
+function currentTimeHHmm(): string {
+  const now = new Date()
+  return now.toTimeString().slice(0, 5)
+}
 
 function openPlaceModal(date: string): void {
   selectedDate.value = date
-  placeForm.value = { chipTypeId: chipTypes.value?.[0]?.id ?? '', date, note: null }
+  placeTime.value = currentTimeHHmm()
+  placeForm.value = { chipTypeId: chipTypes.value?.[0]?.id ?? '', note: null }
   placeError.value = null
   showPlaceModal.value = true
 }
@@ -145,7 +152,8 @@ function submitPlaceChip(): void {
     placeError.value = 'Please select a chip type.'
     return
   }
-  placeChip(placeForm.value)
+  const dateTime = `${selectedDate.value}T${placeTime.value}:00+00:00`
+  placeChip({ ...placeForm.value, dateTime })
 }
 
 // ─── Remove chip modal ───────────────────────────────────────────────────────
@@ -304,6 +312,15 @@ const { mutate: removeChip, isPending: removing } = useMutation({
               <span class="truncate">{{ ct.name }}</span>
             </button>
           </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-sm font-medium text-[var(--text-2)]">Time</label>
+          <input
+            v-model="placeTime"
+            type="time"
+            class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-md)] text-sm bg-[var(--surface-3)] text-[var(--text)] focus:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 outline-none"
+          />
         </div>
 
         <div class="flex flex-col gap-1.5">

@@ -31,8 +31,7 @@ final readonly class PlaceChipHandler
             );
         }
 
-        $now = new \DateTimeImmutable();
-        $date = new \DateTimeImmutable($command->date . ' ' . $now->format('H:i:s'));
+        $date = new \DateTimeImmutable($command->dateTime);
 
         $calendar->placeChip(
             chipId: ChipId::generate(),

@@ -33,10 +33,10 @@ use Symfony\Component\Routing\Attribute\Route;
     requestBody: new OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ['chipTypeId', 'date'],
+            required: ['chipTypeId', 'dateTime'],
             properties: [
                 new OA\Property(property: 'chipTypeId', type: 'string', format: 'uuid', example: 'a1b2c3d4-...'),
-                new OA\Property(property: 'date', type: 'string', format: 'date', example: '2026-03-28'),
+                new OA\Property(property: 'dateTime', type: 'string', format: 'date-time', example: '2026-03-28T14:35:00+00:00'), // phpcs:ignore Generic.Files.LineLength
                 new OA\Property(property: 'note', type: 'string', nullable: true, example: 'Annual checkup'),
             ]
         )
@@ -63,7 +63,7 @@ final readonly class PlaceChipController
         $this->commandBus->dispatch(new PlaceChipCommand(
             catId: $catId,
             chipTypeId: $request->chipTypeId,
-            date: $request->date,
+            dateTime: $request->dateTime,
             note: $request->note,
             authorId: $user->getId(),
         ));

@@ -3,7 +3,7 @@ import { apiClient } from './client'
 
 export interface PlaceChipRequest {
   chipTypeId: string
-  date: string
+  dateTime: string
   note?: string | null
 }
 

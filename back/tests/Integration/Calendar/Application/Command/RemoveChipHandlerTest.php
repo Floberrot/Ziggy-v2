@@ -36,7 +36,7 @@ final class RemoveChipHandlerTest extends KernelTestCase
         ($this->placeHandler)(new PlaceChipCommand(
             catId: $catId,
             chipTypeId: 'type-1',
-            date: '2026-03-01',
+            dateTime: '2026-03-01',
             authorId: 'author-xyz',
         ));
 
@@ -71,7 +71,7 @@ final class RemoveChipHandlerTest extends KernelTestCase
         ($this->placeHandler)(new PlaceChipCommand(
             catId: $catId,
             chipTypeId: 'type-1',
-            date: '2026-03-01',
+            dateTime: '2026-03-01',
             authorId: 'author-xyz',
         ));
 
