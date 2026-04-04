@@ -5,7 +5,7 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
-    resolver 127.0.0.11 valid=30s ipv6=off;
+    resolver [::1]:53 valid=30s ipv6=off;
 
     # Proxy API calls to the backend service
     location /api {
