@@ -107,18 +107,7 @@ function getMonday(d: Date): Date {
   return date
 }
 
-function getSmartWeekStart(): Date {
-  const day = today.getDay()
-  if (day === 0 || day === 6) {
-    const next = new Date(today)
-    next.setDate(today.getDate() + (day === 6 ? 2 : 1))
-    next.setHours(0, 0, 0, 0)
-    return next
-  }
-  return getMonday(today)
-}
-
-const weekStart = ref(getSmartWeekStart())
+const weekStart = ref(getMonday(today))
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
