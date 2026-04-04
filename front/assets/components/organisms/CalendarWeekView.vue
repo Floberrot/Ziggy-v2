@@ -46,7 +46,7 @@ function toISO(d: Date): string {
 
 function chipTime(chip: EnrichedChip): string {
   const d = new Date(chip.date)
-  return d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false })
+  return d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })
 }
 </script>
 
