@@ -3,7 +3,7 @@
     auto_https off
 }
 
-{$SERVER_NAME:80} {
+:{$PORT:80} {
     root * /app/public
     encode zstd br gzip
 
