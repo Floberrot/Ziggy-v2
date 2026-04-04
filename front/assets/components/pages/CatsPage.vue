@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { catsApi, type CreateCatRequest } from '../../api/cats'
 import type { Cat } from '../../types'
 import BaseButton from '../atoms/BaseButton.vue'
@@ -12,9 +11,19 @@ import CatCard from '../organisms/CatCard.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
 import { useUiStore } from '../../stores/useUiStore'
 
-const router = useRouter()
 const uiStore = useUiStore()
 const queryClient = useQueryClient()
+
+const CAT_COLOR_PRESETS = [
+  '#E07A3A', // ginger
+  '#1C1C1C', // black
+  '#9B9B9B', // grey
+  '#F5F0E8', // white/cream
+  '#D4955A', // calico
+  '#8B6340', // tabby brown
+  '#7BA0C0', // blue-grey
+  '#C0A0C8', // lilac
+]
 
 const { data: cats, isPending, isError } = useQuery({
   queryKey: ['cats'],
@@ -149,7 +158,6 @@ function handleDelete(cat: Cat): void {
           :cat="cat"
           @edit="openEdit"
           @delete="handleDelete"
-          @calendar="(c) => router.push(`/cats/${c.id}/calendar`)"
         />
       </div>
     </div>
@@ -172,7 +180,7 @@ function handleDelete(cat: Cat): void {
           placeholder="e.g. 4.5"
           @update:model-value="form.weight = $event ? parseFloat($event) : null"
         />
-        <BaseColorPicker v-model="form.color" label="Color" />
+        <BaseColorPicker v-model="form.color" label="Color" :presets="CAT_COLOR_PRESETS" />
         <div class="flex justify-end gap-3 pt-2">
           <BaseButton type="button" variant="secondary" @click="closeModal">Cancel</BaseButton>
           <BaseButton type="submit" variant="primary" :loading="creating || updating">

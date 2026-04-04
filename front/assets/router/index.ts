@@ -70,9 +70,7 @@ const router = createRouter({
     },
     {
       path: '/cats/:catId/calendar',
-      name: 'calendar',
-      component: () => import('../components/pages/CalendarPage.vue'),
-      meta: { requiresAuth: true },
+      redirect: (to) => ({ path: '/dashboard', query: { cat: String(to.params.catId) } }),
     },
   ],
 })

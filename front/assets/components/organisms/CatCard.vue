@@ -1,22 +1,28 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import type { Cat } from '../../types'
 import BaseButton from '../atoms/BaseButton.vue'
 
-defineProps<{
+const props = defineProps<{
   cat: Cat
 }>()
 
 defineEmits<{
   edit: [cat: Cat]
   delete: [cat: Cat]
-  calendar: [cat: Cat]
 }>()
+
+const router = useRouter()
+
+function openCalendar(): void {
+  void router.push({ path: '/dashboard', query: { cat: props.cat.id } })
+}
 </script>
 
 <template>
   <article
     class="bg-[var(--surface)] rounded-2xl border border-[var(--border)] hover:border-rose-500/30 hover:shadow-lg hover:shadow-rose-500/5 transition-all p-5 flex flex-col gap-3 group cursor-pointer"
-    @click="$emit('calendar', cat)"
+    @click="openCalendar"
   >
     <div class="flex items-start justify-between">
       <div>
