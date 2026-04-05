@@ -4,50 +4,136 @@ ALWAYS COMMIT WITH ONLY ME AS AUTHOR
 
 Stack: **Symfony UX · Vue 3 · FrankenPHP · Docker**
 
-## Global Rules
-
-- **Never use FQCN inline** — always import classes with `use` statements at the top of the file
-- All code quality checks (PHPStan, PHPCS, Deptrac) must pass before any PR is merged
-- No mixed types, no ignored errors without justification
-- Every `@phpstan-ignore` must have a comment explaining why
-- Return types, parameter types, and property types must all be explicit
-- Use `readonly` properties and `final` classes wherever possible. `readonly` on props is useless if the class can be `readonly`.
-- `Domain` depends on nothing — zero external layer imports
-- `Application` may only depend on `Domain`
-- `Infrastructure` may depend on `Application` and `Domain`
-- Any violation = build failure; never suppress without a documented reason
-- **Dependencies point inward**: Infrastructure → Application → Domain
-- **Domain is pure PHP**: no Symfony, no Doctrine, no framework anywhere in Domain
-- **Commands mutate state; Queries return data** — never mix the two
-- **Domain Events are dispatched after persistence**, never before
-- **Handlers are thin**: orchestrate only, delegate logic to the Domain
-- **Read models are separate from write models**: Query handlers return DTOs, not entities
-- **One bounded context per top-level namespace** under `src/`
-- **Never use FQCN inline** — always import classes with `use` statements at the top of the file
-- **Controller should have a MapRequestPayload in entry to have a typed object request**
-- **Every exception should be different. No `DomainException` re-use every where. In Shared there can be abstract exception such as NotFoundException.**
-- **A middleware listen every Exception thrown an return a specific response with this exception.**
-- **Every exception should be logged in the middleware**
-- **Absolutely never line of codes should be written in French**
-- **Response of query handler should ALWAYS be object typed OR array but the to Array function should be implements Domain models. The response logic belongs to Domain.**
-- **Readonly properties are useless if class is readonly.**
-- Do not create DomainEvent if no listener used them. All code MUST be clear, used and clean.
-- SRP should be main thing. A handler should not do anything. Create as much as you can services/ports and call them with DI. 
-
-## Plan & Ship
-
-When the user says **"make a plan and execute it"**, **"plan and ship"**, or any equivalent phrasing, you **must** invoke the `plan-and-ship` skill. This skill enforces the full lifecycle:
-
-1. Enter plan mode — present a structured plan and wait for explicit approval.
-2. Implement following all architecture and code quality rules.
-3. Run all quality gates in order: `phpcbf` → `phpcs` → `phpstan` → `deptrac` → `vue-tsc` (if frontend touched). Fix every error before opening a PR.
-4. Checkout a feature branch, commit (Conventional Commits), push, and open a PR with `gh pr create`.
-
-**Never open a PR if any quality gate fails.**
-
 ## Sub-files
 
 @.claude/backend.md
 @.claude/frontend.md
 @.claude/quality.md
 @.claude/skills.md
+
+---
+
+## Global Rules
+
+### Architecture
+- **Dependencies point inward**: Infrastructure → Application → Domain
+- **Domain is pure PHP**: no Symfony, no Doctrine, no framework anywhere in Domain
+- **One bounded context per top-level namespace** under `src/`
+- **Commands mutate state; Queries return data** — never mix the two
+- **Handlers are thin**: orchestrate only, delegate logic to Domain services injected via DI
+- **Read models are separate from write models**: Query handlers return DTOs, not entities
+- **Domain Events are dispatched after persistence**, never before
+- Do not create DomainEvents if no listener uses them — all code must be used and clean
+- **Response of query handler must always be a typed object or array** — `toArray()` logic belongs to the Domain model, not the handler
+
+### Code Style
+- **Never use FQCN inline** — always import classes with `use` statements at the top of the file
+- **All code must be written in English** — absolutely no French in any line of code, comment, or string
+- Return types, parameter types, and property types must all be explicit
+- Use `final` classes wherever possible
+- Use `readonly` on class level when all properties are readonly — do not add `readonly` to individual properties of a `readonly class`
+- No mixed types anywhere
+
+### Controllers
+- **Controllers must use `#[MapRequestPayload]`** to receive a typed request object — never parse `$request->getContent()` manually
+- No logic in controllers — dispatch only; errors are handled by the exception middleware
+- No `try/catch` in controllers for domain exceptions
+
+### Exceptions
+- **Every exception must be a distinct class** — never reuse `DomainException` or throw base exceptions directly
+- Shared abstract exceptions (e.g. `NotFoundException`, `BusinessRuleException`) may live in `Shared/Domain/Exception/`
+- **A middleware catches every thrown exception and returns the appropriate HTTP response**
+- **Every exception must be logged in the middleware**
+
+### PHPStan / Quality
+- No mixed types, no ignored errors without justification
+- Every `@phpstan-ignore` must have a comment explaining why
+- All code quality checks (PHPStan, PHPCS, Deptrac) must pass before any PR is merged
+
+---
+
+## Testing Requirements
+
+**Every new feature must be covered by tests. No exception.**
+
+### Rules
+- **Functional tests are mandatory** for every new feature — at minimum one happy path and one error path per endpoint
+- **Unit tests are strongly preferred** for Domain models, Value Objects, and Domain Services — test invariants, state transitions, and validations
+- **Integration tests** are expected for complex Application handlers (use `KernelTestCase`)
+- Tests must live in `tests/Unit/`, `tests/Integration/`, or `tests/Functional/` mirroring the `src/` structure
+- Use in-memory repository fakes (in `tests/Shared/InMemory/`) for unit and integration tests — never hit the real database in unit tests
+- Functional tests use `WebTestCase` + DAMA Doctrine Test Bundle (auto transaction rollback)
+- Authenticated endpoints require an `AuthenticatedWebTestCase` base class with a `getAuthToken()` helper
+- **Running `php bin/phpunit` must pass before any PR is merged**
+
+### Test structure
+```
+tests/
+├── Shared/
+│   └── InMemory/          # In-memory repository fakes implementing Domain interfaces
+├── Unit/
+│   └── <BoundedContext>/Domain/   # Domain model, value object, service tests
+├── Integration/
+│   └── <BoundedContext>/Application/  # Handler tests via KernelTestCase
+└── Functional/
+    └── <BoundedContext>/          # HTTP controller tests via WebTestCase
+```
+
+---
+
+## Mandatory Skill Invocations
+
+Claude **must** invoke the following skills without being asked when the context matches.
+
+### Plan & Ship
+When the user says **"make a plan and execute it"**, **"plan and ship"**, or any equivalent:
+→ **invoke `plan-and-ship`**
+
+Full lifecycle enforced:
+1. Enter plan mode — structured plan, wait for approval
+2. Implement following all architecture, quality, and testing rules
+3. Quality gates in order: `phpcbf` → `phpcs` → `phpstan` → `deptrac` → `vue-tsc` (if frontend touched) → `php bin/phpunit`
+4. Checkout feature branch, commit (Conventional Commits), push, open PR
+
+**Never open a PR if any quality gate or test fails.**
+
+### Symfony UX — Frontend UI
+
+| Context | Skill to invoke |
+|---|---|
+| Pure client-side JS behavior, no server round-trip | `stimulus` |
+| Navigation, partial page updates, Turbo Frames/Streams | `turbo` |
+| Reusable static server-rendered UI component (Twig) | `twig-component` |
+| Reactive component re-rendering on user interaction | `live-component` |
+| SVG icons (local or Iconify) | `ux-icons` |
+| Interactive maps | `ux-map` |
+| Unsure which Symfony UX tool fits | `symfony-ux` |
+
+### Vue.js
+
+| Context | Skill to invoke |
+|---|---|
+| Any `.vue` file work | `vue-best-practices` — **always load** |
+| Composable (shared logic, `use*` prefix) | `create-adaptable-composable` |
+| Pinia store work | `vue-pinia-best-practices` |
+| Vue Router guards or navigation | `vue-router-best-practices` |
+| Vue component or composable testing | `vue-testing-best-practices` |
+| Debugging a Vue runtime error or warning | `vue-debug-guides` |
+
+### Infrastructure & DevOps
+
+| Context | Skill to invoke |
+|---|---|
+| FrankenPHP config, workers, real-time | `frankenphp` |
+| Dockerfile, multi-stage build, docker-compose | `docker-containerization` |
+| Docker CLI commands | `docker-cli` |
+
+---
+
+## Architectural Reminders (quick reference)
+
+- `Domain` → nothing
+- `Application` → `Domain` only
+- `Infrastructure` → `Application` + `Domain`
+- SRP first: one class, one responsibility; inject everything via DI
+- Handler = orchestrator only; real logic lives in Domain Services
