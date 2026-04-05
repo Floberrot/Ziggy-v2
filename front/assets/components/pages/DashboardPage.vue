@@ -11,6 +11,7 @@ import { useUiStore } from '../../stores/useUiStore'
 import { useAuthStore } from '../../stores/useAuthStore'
 import BaseButton from '../atoms/BaseButton.vue'
 import BaseModal from '../molecules/BaseModal.vue'
+import CalendarDayView from '../organisms/CalendarDayView.vue'
 import CalendarMonthView from '../organisms/CalendarMonthView.vue'
 import CalendarWeekView from '../organisms/CalendarWeekView.vue'
 import MainTemplate from '../templates/MainTemplate.vue'
@@ -92,12 +93,17 @@ const enrichedChips = computed((): EnrichedChip[] => {
 
 // ─── Navigation state ────────────────────────────────────────────────────────
 
-type ViewMode = 'month' | 'week'
-const viewMode = ref<ViewMode>('week')
+type ViewMode = 'month' | 'week' | 'day'
+
+const isMobile = typeof window !== 'undefined' && window.innerWidth < 640
+const viewMode = ref<ViewMode>(isMobile ? 'day' : 'week')
 
 const today = new Date()
 const currentYear = ref(today.getFullYear())
 const currentMonth = ref(today.getMonth())
+
+const currentDay = ref(new Date(today))
+currentDay.value.setHours(0, 0, 0, 0)
 
 function getMonday(d: Date): Date {
   const date = new Date(d)
@@ -118,6 +124,9 @@ const headerLabel = computed(() => {
   if (viewMode.value === 'month') {
     return `${MONTH_NAMES[currentMonth.value]} ${currentYear.value}`
   }
+  if (viewMode.value === 'day') {
+    return currentDay.value.toLocaleDateString('en', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+  }
   const end = new Date(weekStart.value)
   end.setDate(end.getDate() + 6)
   return `${weekStart.value.toLocaleDateString('en', { month: 'short', day: 'numeric' })} – ${end.toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}`
@@ -127,6 +136,10 @@ function prev(): void {
   if (viewMode.value === 'month') {
     if (currentMonth.value === 0) { currentMonth.value = 11; currentYear.value-- }
     else currentMonth.value--
+  } else if (viewMode.value === 'day') {
+    const d = new Date(currentDay.value)
+    d.setDate(d.getDate() - 1)
+    currentDay.value = d
   } else {
     const d = new Date(weekStart.value)
     d.setDate(d.getDate() - 7)
@@ -138,6 +151,10 @@ function next(): void {
   if (viewMode.value === 'month') {
     if (currentMonth.value === 11) { currentMonth.value = 0; currentYear.value++ }
     else currentMonth.value++
+  } else if (viewMode.value === 'day') {
+    const d = new Date(currentDay.value)
+    d.setDate(d.getDate() + 1)
+    currentDay.value = d
   } else {
     const d = new Date(weekStart.value)
     d.setDate(d.getDate() + 7)
@@ -147,9 +164,12 @@ function next(): void {
 
 function goToday(): void {
   const now = new Date()
+  const startOfToday = new Date(now)
+  startOfToday.setHours(0, 0, 0, 0)
   currentYear.value = now.getFullYear()
   currentMonth.value = now.getMonth()
   weekStart.value = getMonday(now)
+  currentDay.value = startOfToday
 }
 
 // ─── Color contrast helper ───────────────────────────────────────────────────
@@ -323,13 +343,17 @@ const { mutate: removeChip, isPending: removing } = useMutation({
             <!-- View toggle -->
             <div class="flex rounded-xl overflow-hidden border border-[var(--border-md)] bg-[var(--surface-3)]">
               <button
-                :class="['px-3 py-1.5 text-sm font-medium transition-colors', viewMode === 'month' ? 'bg-rose-500 text-white' : 'text-[var(--text-2)] hover:text-[var(--text)]']"
-                @click="viewMode = 'month'"
-              >Month</button>
+                :class="['px-3 py-1.5 text-sm font-medium transition-colors', viewMode === 'day' ? 'bg-rose-500 text-white' : 'text-[var(--text-2)] hover:text-[var(--text)]']"
+                @click="viewMode = 'day'"
+              >Day</button>
               <button
                 :class="['px-3 py-1.5 text-sm font-medium transition-colors', viewMode === 'week' ? 'bg-rose-500 text-white' : 'text-[var(--text-2)] hover:text-[var(--text)]']"
                 @click="viewMode = 'week'"
               >Week</button>
+              <button
+                :class="['px-3 py-1.5 text-sm font-medium transition-colors', viewMode === 'month' ? 'bg-rose-500 text-white' : 'text-[var(--text-2)] hover:text-[var(--text)]']"
+                @click="viewMode = 'month'"
+              >Month</button>
             </div>
 
             <BaseButton variant="secondary" size="sm" @click="goToday">Today</BaseButton>
@@ -374,8 +398,15 @@ const { mutate: removeChip, isPending: removing } = useMutation({
 
         <!-- Calendar views -->
         <div class="bg-[var(--surface)]/60 rounded-2xl p-3 border border-[var(--border)]">
+          <CalendarDayView
+            v-if="viewMode === 'day'"
+            :day="currentDay"
+            :chips="enrichedChips"
+            @day-click="openPlaceModal"
+            @chip-click="openChipModal"
+          />
           <CalendarMonthView
-            v-if="viewMode === 'month'"
+            v-else-if="viewMode === 'month'"
             :year="currentYear"
             :month="currentMonth"
             :chips="enrichedChips"
