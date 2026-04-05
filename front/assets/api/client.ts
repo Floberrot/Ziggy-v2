@@ -1,6 +1,35 @@
+import router from '../router'
+import { useAuthStore } from '../stores/useAuthStore'
+import { useUiStore } from '../stores/useUiStore'
+
 const BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api'
 
+let handlingExpiry = false
+
+function handleSessionExpiry(): void {
+  if (handlingExpiry) return
+  handlingExpiry = true
+
+  const authStore = useAuthStore()
+  const uiStore = useUiStore()
+
+  authStore.markSessionExpired()
+  uiStore.addNotification('Your session has expired. Redirecting to login…', 'error')
+
+  setTimeout(() => {
+    authStore.logout()
+    void router.push('/login')
+    handlingExpiry = false
+  }, 2000)
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const authStore = useAuthStore()
+
+  if (authStore.sessionExpired) {
+    throw new Error('Session expired')
+  }
+
   const token = sessionStorage.getItem('jwt_token')
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -12,6 +41,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...options,
     headers,
   })
+
+  if (response.status === 401) {
+    handleSessionExpiry()
+    throw new Error('Session expired')
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: response.statusText }))
