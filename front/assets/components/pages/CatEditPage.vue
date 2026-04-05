@@ -111,7 +111,7 @@ function handleSubmit(): void {
               {{ formError }}
             </div>
             <BaseInput v-model="form.name" label="Name *" placeholder="e.g. Mochi" />
-            <BaseInput v-model="form.breed" label="Breed" placeholder="e.g. Maine Coon" />
+            <BaseInput :model-value="form.breed ?? undefined" label="Breed" placeholder="e.g. Maine Coon" @update:model-value="form.breed = $event || null" />
             <BaseInput
               :model-value="form.weight !== null ? String(form.weight) : ''"
               type="number"

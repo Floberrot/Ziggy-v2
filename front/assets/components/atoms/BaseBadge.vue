@@ -1,26 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   variant?: 'default' | 'success' | 'warning' | 'danger' | 'custom'
   color?: string
 }>(), {
   variant: 'default',
-})
-
-function hexToRgb(hex: string) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  return result
-    ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) }
-    : null
-}
-
-const contrastColor = computed(() => {
-  if (!props.color) return '#fff'
-  const rgb = hexToRgb(props.color)
-  if (!rgb) return '#fff'
-  const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255
-  return luminance > 0.5 ? '#1f2937' : '#fff'
 })
 </script>
 

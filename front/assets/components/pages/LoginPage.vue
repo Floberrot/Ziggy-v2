@@ -22,7 +22,7 @@ const successMessage = computed(() => {
   return null
 })
 
-const { mutate, isPending, error } = useMutation({
+const { mutate, isPending } = useMutation({
   mutationFn: () => authApi.login({ email: email.value, password: password.value }),
   onSuccess: async (data) => {
     queryClient.clear()

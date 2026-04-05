@@ -17,7 +17,8 @@
         <server name="APP_ENV" value="test" force="true" />
         <server name="KERNEL_CLASS" value="App\Kernel" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
-        <env name="DATABASE_URL" value="postgresql://ziggy:ziggy@127.0.0.1:5432/ziggy_test?serverVersion=16&amp;charset=utf8"/>
+        <!-- DATABASE_URL intentionally omitted: doctrine.yaml appends _test suffix when APP_ENV=test -->
+        <!-- The workflow injects DATABASE_URL=...ziggy → Doctrine resolves it as ziggy_test -->
     </php>
 
     <testsuites>
