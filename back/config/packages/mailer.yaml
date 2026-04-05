@@ -1,6 +1,6 @@
 framework:
     mailer:
-        dsn: '%env(MAILER_DSN)%'
+        dsn: 'smtp://%env(rawurlencode:MAILER_USER)%:%env(rawurlencode:MAILER_PASSWORD)%@%env(MAILER_HOST)%:%env(int:MAILER_PORT)%'
         envelope:
             sender: 'noreply@ziggy.dev'
         headers:

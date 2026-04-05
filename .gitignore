@@ -1,3 +1,7 @@
 .idea/
 
 front/node_modules/
+
+# Production secrets — never commit
+docker-compose.prod.yml
+.env.prod
