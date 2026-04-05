@@ -95,13 +95,14 @@ function handleSubmit(): void {
             :disabled="true"
           />
           <BaseInput
-            v-model.number="form.age"
+            :model-value="form.age !== null ? String(form.age) : ''"
             type="number"
             label="Age"
             placeholder="Your age"
+            @update:model-value="form.age = $event ? Number($event) : null"
           />
           <BaseInput
-            v-model="form.phoneNumber"
+            :model-value="form.phoneNumber ?? undefined"
             type="tel"
             label="Phone number"
             placeholder="+1 234 567 890"

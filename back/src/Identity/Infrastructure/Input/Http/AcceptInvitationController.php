@@ -59,9 +59,6 @@ final readonly class AcceptInvitationController
 
         /** @var HandledStamp $stamp */
         $stamp = $envelope->last(HandledStamp::class);
-        $this->commandBus->dispatch(
-            new AcceptInvitationCommand($request->token, $request->password, $request->username)
-        );
 
         /** @var AcceptInvitationResult $result */
         $result = $stamp->getResult();

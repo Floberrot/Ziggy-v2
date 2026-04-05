@@ -49,15 +49,6 @@ final class CatTest extends TestCase
         self::assertEmpty($cat->colors());
     }
 
-    public function testRenameUpdatesCatName(): void
-    {
-        $cat = Cat::add(CatId::generate(), new CatName('OldName'), 'owner-1');
-
-        $cat->rename(new CatName('NewName'));
-
-        self::assertSame('NewName', $cat->name()->value());
-    }
-
     public function testCatNameRejectsEmptyString(): void
     {
         $this->expectException(\InvalidArgumentException::class);

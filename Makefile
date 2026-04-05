@@ -111,8 +111,9 @@ migration-status: ## Show migration status
 
 .PHONY: db-reset
 db-reset: ## Drop, create and migrate the database (⚠ destroys data)
-	$(APP) php bin/console doctrine:database:drop --force --if-exists
-	$(APP) php bin/console doctrine:database:create
+	$(DB) psql -U ziggy -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'ziggy' AND pid <> pg_backend_pid();"
+	$(DB) psql -U ziggy -d postgres -c "DROP DATABASE IF EXISTS ziggy;"
+	$(DB) psql -U ziggy -d postgres -c "CREATE DATABASE ziggy OWNER ziggy;"
 	$(APP) php bin/console doctrine:migrations:migrate --no-interaction
 
 .PHONY: fixtures

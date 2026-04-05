@@ -10,8 +10,7 @@ defaults:
 
 env:
   APP_SECRET: ci-secret-not-used
-  JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
-  # Base URL without _test suffix — doctrine.yaml appends _test when env=test
+  JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'ci-jwt-passphrase' }}
   DATABASE_URL: postgresql://ziggy:ziggy@127.0.0.1:5432/ziggy?serverVersion=16&charset=utf8
 
 jobs:
@@ -40,7 +39,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          extensions: pdo_pgsql
+          extensions: pdo_pgsql, intl
           tools: composer
           coverage: none
 

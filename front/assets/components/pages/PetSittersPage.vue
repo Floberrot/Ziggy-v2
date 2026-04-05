@@ -217,9 +217,9 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
             <option v-for="t in petSitterTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
           </select>
         </div>
-        <BaseInput v-model.number="editForm.age" type="number" label="Age" placeholder="Optional" />
+        <BaseInput :model-value="editForm.age !== null ? String(editForm.age) : ''" type="number" label="Age" placeholder="Optional" @update:model-value="editForm.age = $event ? Number($event) : null" />
         <BaseInput
-          v-model="editForm.phoneNumber"
+          :model-value="editForm.phoneNumber ?? undefined"
           type="tel"
           label="Phone number"
           placeholder="Optional"
@@ -259,9 +259,9 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
             <option v-for="t in petSitterTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
           </select>
         </div>
-        <BaseInput v-model.number="createForm.age" type="number" label="Age" placeholder="Optional" />
+        <BaseInput :model-value="createForm.age !== null ? String(createForm.age) : ''" type="number" label="Age" placeholder="Optional" @update:model-value="createForm.age = $event ? Number($event) : null" />
         <BaseInput
-          v-model="createForm.phoneNumber"
+          :model-value="createForm.phoneNumber ?? undefined"
           type="tel"
           label="Phone number"
           placeholder="Optional"

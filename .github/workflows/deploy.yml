@@ -10,58 +10,280 @@ env:
   RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
   RAILWAY_ENVIRONMENT_ID: ${{ vars.RAILWAY_ENVIRONMENT_ID }}
 
+# ---------------------------------------------------------------------------
+# Quality gate — every deploy must pass all checks before Railway is touched
+# ---------------------------------------------------------------------------
+
 jobs:
+
+  # --- Backend: code style ---------------------------------------------------
+
+  phpcs:
+    name: "Gate: PHP_CodeSniffer"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+    env:
+      APP_SECRET: ci-secret-not-used
+      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'ci-jwt-passphrase' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer
+          coverage: none
+      - uses: actions/cache@v4
+        with:
+          path: back/vendor
+          key: composer-${{ hashFiles('back/composer.lock') }}
+          restore-keys: composer-
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: vendor/bin/phpcs
+
+  # --- Backend: architecture -------------------------------------------------
+
+  deptrac:
+    name: "Gate: Deptrac"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+    env:
+      APP_SECRET: ci-secret-not-used
+      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'ci-jwt-passphrase' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer
+          coverage: none
+      - uses: actions/cache@v4
+        with:
+          path: back/vendor
+          key: composer-${{ hashFiles('back/composer.lock') }}
+          restore-keys: composer-
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: vendor/bin/deptrac analyse --no-progress
+
+  # --- Backend: static analysis ----------------------------------------------
+
+  phpstan:
+    name: "Gate: PHPStan"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+    env:
+      DATABASE_URL: postgresql://ziggy:ziggy@127.0.0.1:5432/ziggy?serverVersion=16&charset=utf8
+      APP_SECRET: ci-secret-not-used
+      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'ci-jwt-passphrase' }}
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ziggy
+          POSTGRES_PASSWORD: ziggy
+          POSTGRES_DB: ziggy
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, intl
+          tools: composer
+          coverage: none
+      - uses: actions/cache@v4
+        with:
+          path: back/vendor
+          key: composer-${{ hashFiles('back/composer.lock') }}
+          restore-keys: composer-
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Generate JWT keys
+        run: |
+          mkdir -p config/jwt
+          openssl genrsa -passout pass:${JWT_PASSPHRASE} -out config/jwt/private.pem 4096
+          openssl rsa -pubout -passin pass:${JWT_PASSPHRASE} -in config/jwt/private.pem -out config/jwt/public.pem
+      - run: php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+      - run: php bin/console cache:warmup --env=dev
+      - run: vendor/bin/phpstan analyse --no-progress
+
+  # --- Backend: database migrations ------------------------------------------
+
+  db-migrations:
+    name: "Gate: DB Migrations"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+    env:
+      DATABASE_URL: postgresql://ziggy:ziggy@127.0.0.1:5432/ziggy?serverVersion=16&charset=utf8
+      APP_SECRET: ci-secret-not-used
+      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'ci-jwt-passphrase' }}
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ziggy
+          POSTGRES_PASSWORD: ziggy
+          POSTGRES_DB: ziggy
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, intl
+          tools: composer
+          coverage: none
+      - uses: actions/cache@v4
+        with:
+          path: back/vendor
+          key: composer-${{ hashFiles('back/composer.lock') }}
+          restore-keys: composer-
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Generate JWT keys
+        run: |
+          mkdir -p config/jwt
+          openssl genrsa -passout pass:${JWT_PASSPHRASE} -out config/jwt/private.pem 4096
+          openssl rsa -pubout -passin pass:${JWT_PASSPHRASE} -in config/jwt/private.pem -out config/jwt/public.pem
+      - run: php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+      - run: php bin/console doctrine:schema:validate
+
+  # --- Backend: test suite ---------------------------------------------------
+
+  tests:
+    name: "Gate: PHPUnit"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+    env:
+      DATABASE_URL: postgresql://ziggy:ziggy@127.0.0.1:5432/ziggy?serverVersion=16&charset=utf8
+      APP_SECRET: ci-secret-not-used
+      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'ci-jwt-passphrase' }}
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ziggy
+          POSTGRES_PASSWORD: ziggy
+          POSTGRES_DB: ziggy
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, intl
+          tools: composer
+          coverage: none
+      - uses: actions/cache@v4
+        with:
+          path: back/vendor
+          key: composer-${{ hashFiles('back/composer.lock') }}
+          restore-keys: composer-
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Generate JWT keys
+        run: |
+          mkdir -p config/jwt
+          openssl genrsa -passout pass:${JWT_PASSPHRASE} -out config/jwt/private.pem 4096
+          openssl rsa -pubout -passin pass:${JWT_PASSPHRASE} -in config/jwt/private.pem -out config/jwt/public.pem
+      - run: php bin/console doctrine:database:create --env=test --if-not-exists
+      - run: php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --env=test
+      - run: php bin/phpunit --no-progress
+
+  # --- Frontend: TypeScript + ESLint -----------------------------------------
+
+  frontend:
+    name: "Gate: Frontend (vue-tsc + ESLint)"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+      - run: npm ci
+      - run: npm run type-check
+      - run: npm run lint
+
+  # ---------------------------------------------------------------------------
+  # Deploy — only runs when every quality-gate job above succeeds
+  # ---------------------------------------------------------------------------
+
   deploy-back:
     name: Deploy Backend
     runs-on: ubuntu-latest
     environment: production
+    needs: [phpcs, deptrac, phpstan, db-migrations, tests, frontend]
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Railway CLI
         run: npm install -g @railway/cli
-
       - name: Deploy backend service
+        working-directory: back
         run: |
           railway up \
             --service ziggy-back \
             --ci \
             -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
-        working-directory: back
 
   deploy-worker:
     name: Deploy Worker
     runs-on: ubuntu-latest
     environment: production
-    needs: deploy-back
+    needs: [deploy-back]
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Railway CLI
         run: npm install -g @railway/cli
-
       - name: Deploy worker service
+        working-directory: back
         run: |
           railway up \
             --service ziggy-worker \
             --ci \
             -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
-        working-directory: back
 
   deploy-front:
     name: Deploy Frontend
     runs-on: ubuntu-latest
     environment: production
+    needs: [phpcs, deptrac, phpstan, db-migrations, tests, frontend]
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Railway CLI
         run: npm install -g @railway/cli
-
       - name: Deploy frontend service
+        working-directory: front
         run: |
           railway up \
             --service ziggy-front \
             --ci \
             -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
-        working-directory: front
