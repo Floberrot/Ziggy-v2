@@ -1,4 +1,4 @@
-name: Deploy to Railway
+name: Deploy — Staging
 
 on:
   push:
@@ -8,10 +8,11 @@ on:
 env:
   RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
   RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
-  RAILWAY_ENVIRONMENT_ID: ${{ vars.RAILWAY_ENVIRONMENT_ID }}
+  RAILWAY_ENVIRONMENT_ID: ${{ vars.RAILWAY_STAGING_ENVIRONMENT_ID }}
 
 # ---------------------------------------------------------------------------
-# Quality gate — every deploy must pass all checks before Railway is touched
+# Quality gate — identical to production; every deploy must pass before
+# Railway is touched
 # ---------------------------------------------------------------------------
 
 jobs:
@@ -234,13 +235,13 @@ jobs:
       - run: npm run lint
 
   # ---------------------------------------------------------------------------
-  # Deploy — only runs when every quality-gate job above succeeds
+  # Deploy to staging — runs automatically after QA; no approval required
   # ---------------------------------------------------------------------------
 
   deploy-back:
-    name: Deploy Backend
+    name: "Staging: Deploy Backend"
     runs-on: ubuntu-latest
-    environment: production
+    environment: staging
     needs: [phpcs, deptrac, phpstan, db-migrations, tests, frontend]
     steps:
       - uses: actions/checkout@v4
@@ -255,9 +256,9 @@ jobs:
             -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
 
   deploy-worker:
-    name: Deploy Worker
+    name: "Staging: Deploy Worker"
     runs-on: ubuntu-latest
-    environment: production
+    environment: staging
     needs: [deploy-back]
     steps:
       - uses: actions/checkout@v4
@@ -272,9 +273,9 @@ jobs:
             -m "Deploy ${{ github.sha }} — ${{ github.event.head_commit.message }}"
 
   deploy-front:
-    name: Deploy Frontend
+    name: "Staging: Deploy Frontend"
     runs-on: ubuntu-latest
-    environment: production
+    environment: staging
     needs: [phpcs, deptrac, phpstan, db-migrations, tests, frontend]
     steps:
       - uses: actions/checkout@v4
