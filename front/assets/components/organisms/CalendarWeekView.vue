@@ -51,34 +51,46 @@ function chipTime(chip: EnrichedChip): string {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-7 gap-1.5">
+  <!-- Week grid: gap on mobile (stacked), zero-gap + dividers on desktop -->
+  <div class="grid grid-cols-1 sm:grid-cols-7 gap-2 sm:gap-0">
     <div
-      v-for="day in days"
+      v-for="(day, i) in days"
       :key="day.date"
-      class="flex flex-col gap-1.5"
+      :class="[
+        'flex flex-col gap-2',
+        'sm:px-2 first:sm:pl-0 last:sm:pr-0',
+        i < days.length - 1 ? 'sm:border-r sm:border-[var(--border)]/70' : '',
+        i < days.length - 1 ? 'pb-3 sm:pb-0 border-b border-[var(--border)]/50 sm:border-b-0' : '',
+      ]"
     >
       <!-- Column header -->
       <div
         :class="[
-          'py-2 rounded-xl',
-          'flex sm:flex-col flex-row items-center sm:text-center gap-2 sm:gap-0 px-3 sm:px-0',
-          day.date === today ? 'bg-rose-500 shadow-lg shadow-rose-500/30' : 'bg-[var(--surface-2)]',
+          'py-2.5 rounded-xl',
+          'flex sm:flex-col flex-row items-center sm:text-center gap-2.5 sm:gap-0.5 px-3 sm:px-0',
+          day.date === today
+            ? 'bg-rose-500 shadow-md shadow-rose-500/30'
+            : 'bg-[var(--surface-2)]',
         ]"
       >
-        <div :class="['text-xs font-semibold', day.date === today ? 'text-rose-100' : 'text-[var(--text-3)]']">
+        <div :class="['text-[11px] font-bold uppercase tracking-widest', day.date === today ? 'text-rose-100' : 'text-[var(--text-3)]']">
           {{ day.label }}
         </div>
-        <div :class="['text-lg font-bold leading-tight', day.date === today ? 'text-white' : 'text-[var(--text)]']">
+        <div :class="['text-xl font-black leading-tight tabular-nums', day.date === today ? 'text-white' : 'text-[var(--text)]']">
           {{ day.dayNum }}
         </div>
-        <div :class="['text-xs', day.date === today ? 'text-rose-200' : 'text-[var(--text-3)]']">
+        <div :class="['text-[11px]', day.date === today ? 'text-rose-200' : 'text-[var(--text-3)]']">
           {{ day.monthLabel }}
+        </div>
+        <!-- Today indicator dot (desktop, under the number) -->
+        <div v-if="day.date === today" class="hidden sm:flex justify-center mt-0.5">
+          <span class="w-1 h-1 rounded-full bg-white/70" />
         </div>
       </div>
 
       <!-- Chips column -->
       <div
-        class="flex flex-col gap-1 min-h-16 sm:min-h-48 bg-[var(--surface)] rounded-xl border border-[var(--border)] p-1.5 sm:cursor-pointer hover:border-[var(--border-md)] hover:bg-[var(--surface-2)] transition-all group"
+        class="flex flex-col gap-1 min-h-16 sm:min-h-72 bg-[var(--surface)] rounded-xl border border-[var(--border)] p-1.5 sm:cursor-pointer hover:border-[var(--border-md)] hover:bg-[var(--surface-2)] transition-all group"
         @click="emit('dayClick', day.date)"
       >
         <BaseChipPill
@@ -92,8 +104,23 @@ function chipTime(chip: EnrichedChip): string {
           @click.stop="emit('chipClick', chip)"
         />
 
+        <!-- Empty day hint (desktop only) -->
+        <div
+          v-if="!chipsByDate[day.date]?.length"
+          class="hidden sm:flex flex-col items-center justify-center flex-1 gap-1 pointer-events-none"
+        >
+          <div class="w-5 h-5 rounded-full bg-[var(--surface-3)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg class="w-3 h-3 text-[var(--text-3)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+          </div>
+        </div>
+
         <!-- Add hint -->
-        <div class="mt-auto text-center text-xs text-[var(--text-3)] opacity-0 group-hover:opacity-100 transition-opacity pt-1">
+        <div
+          v-else
+          class="mt-auto text-center text-xs text-[var(--text-3)] opacity-0 group-hover:opacity-100 transition-opacity pt-1"
+        >
           + add
         </div>
       </div>
