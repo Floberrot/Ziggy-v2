@@ -13,7 +13,11 @@ services:
       - APP_SECRET=${APP_SECRET:-change_me_in_production}
       - SERVER_NAME=:80
       - DATABASE_URL=postgresql://ziggy:ziggy@db:5432/ziggy?serverVersion=16&charset=utf8
-      - MAILER_DSN=smtp://mailpit:1025
+      - MAILER_DSN=null://null
+      - MAILER_USER=noreply@ziggy.dev
+      - MAILER_PASSWORD=null
+      - MAILER_HOST=mailpit
+      - MAILER_PORT=1025
       - MESSENGER_TRANSPORT_DSN=doctrine://default
       - JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
       - JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
@@ -54,7 +58,11 @@ services:
       - APP_ENV=dev
       - APP_SECRET=${APP_SECRET:-change_me_in_production}
       - DATABASE_URL=postgresql://ziggy:ziggy@db:5432/ziggy?serverVersion=16&charset=utf8
-      - MAILER_DSN=smtp://mailpit:1025
+      - MAILER_DSN=null://null
+      - MAILER_USER=noreply@ziggy.dev
+      - MAILER_PASSWORD=null
+      - MAILER_HOST=mailpit
+      - MAILER_PORT=1025
       - MESSENGER_TRANSPORT_DSN=doctrine://default
       - JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
       - JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
