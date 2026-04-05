@@ -1,8 +1,14 @@
 # Ziggy — Project Guide
 
-ALWAYS COMMIT WITH ONLY ME AS AUTHOR
-
 Stack: **Symfony UX · Vue 3 · FrankenPHP · Docker**
+
+---
+
+## Git Discipline
+
+- **One commit per PR** — a PR must land as a single commit. Prefer `git commit --amend` to add changes to the current commit; use `git rebase -i` to squash only if amend is not possible.
+- **Never create a new commit when one already exists on the branch** — always amend instead.
+- **Commits must be authored solely by the repo owner** — never set Claude or any AI assistant as the author. Always preserve the user's git identity (`user.name` / `user.email`). Never pass `--author` or alter git config.
 
 ## Sub-files
 
@@ -21,6 +27,7 @@ Stack: **Symfony UX · Vue 3 · FrankenPHP · Docker**
 - **One bounded context per top-level namespace** under `src/`
 - **Commands mutate state; Queries return data** — never mix the two
 - **Handlers are thin**: orchestrate only, delegate logic to Domain services injected via DI
+- **A handler performs exactly one action — the one its name describes** (e.g. `RegisterOwnerHandler` registers the owner, nothing else). Any subsequent side-effect (send email, update a related aggregate, notify, log a business event) must be triggered by a Domain Event and handled in a dedicated `EventHandler`. Never chain multiple responsibilities inside a single handler.
 - **Read models are separate from write models**: Query handlers return DTOs, not entities
 - **Domain Events are dispatched after persistence**, never before
 - Do not create DomainEvents if no listener uses them — all code must be used and clean
