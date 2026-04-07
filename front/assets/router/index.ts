@@ -78,6 +78,36 @@ const router = createRouter({
       path: '/cats/:catId/calendar',
       redirect: (to) => ({ path: '/dashboard', query: { cat: String(to.params.catId) } }),
     },
+    // ── Admin routes ──────────────────────────────────────────────────────────
+    {
+      path: '/admin/login',
+      name: 'admin-login',
+      component: () => import('../components/pages/AdminLoginPage.vue'),
+    },
+    {
+      path: '/admin',
+      name: 'admin-dashboard',
+      component: () => import('../components/pages/AdminDashboardPage.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/users',
+      name: 'admin-users',
+      component: () => import('../components/pages/AdminUsersPage.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/cats',
+      name: 'admin-cats',
+      component: () => import('../components/pages/AdminCatsPage.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/pet-sitters',
+      name: 'admin-pet-sitters',
+      component: () => import('../components/pages/AdminPetSittersPage.vue'),
+      meta: { requiresAdmin: true },
+    },
   ],
 })
 
@@ -90,6 +120,13 @@ router.beforeEach((to) => {
 
   if (to.meta.guestOnly && auth.isAuthenticated) {
     return { name: 'dashboard' }
+  }
+
+  if (to.meta.requiresAdmin) {
+    const adminToken = sessionStorage.getItem('admin_jwt_token')
+    if (!adminToken) {
+      return { name: 'admin-login' }
+    }
   }
 })
 

@@ -59,6 +59,31 @@ final readonly class DoctrinePetSitterRepository implements PetSitterRepository
         return array_map($this->toDomain(...), $entities);
     }
 
+    /** @return list<PetSitter> */
+    public function findAll(): array
+    {
+        $entities = $this->entityManager->getRepository(PetSitterOrmEntity::class)->findAll();
+
+        return array_map($this->toDomain(...), $entities);
+    }
+
+    /** @return list<PetSitter> */
+    public function findAllPaginated(int $page, int $limit): array
+    {
+        $entities = $this->entityManager->getRepository(PetSitterOrmEntity::class)
+            ->findBy([], ['createdAt' => 'DESC'], $limit, ($page - 1) * $limit);
+
+        return array_map($this->toDomain(...), $entities);
+    }
+
+    public function countAll(): int
+    {
+        /** @var int $count */
+        $count = $this->entityManager->getRepository(PetSitterOrmEntity::class)->count([]);
+
+        return $count;
+    }
+
     public function findByOwnerAndEmail(string $ownerId, string $inviteeEmail): ?PetSitter
     {
         $entity = $this->entityManager->getRepository(PetSitterOrmEntity::class)

@@ -44,11 +44,14 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         // ------------------------------------------------------------------ users
-        $alice = $this->createUser('flours@ziggy.dev', 'password', Role::OWNER, 'Flours');
-        $bob   = $this->createUser('wolf@ziggy.dev', 'password', Role::PET_SITTER, 'Wolf');
+        $alice   = $this->createUser('flours@ziggy.dev', 'password', Role::OWNER, 'Flours');
+        $bob     = $this->createUser('wolf@ziggy.dev', 'password', Role::PET_SITTER, 'Wolf');
+        $charlie = $this->createUser('charlie@ziggy.dev', 'password', Role::OWNER, 'Charlie');
+        $this->createUser('admin@ziggy.dev', 'admin_password', Role::ADMIN, 'Admin');
 
         // getUserIdentifier() returns email — that's what controllers store as ownerId
-        $aliceEmail = $alice->email()->value();
+        $aliceEmail   = $alice->email()->value();
+        $charlieEmail = $charlie->email()->value();
 
         // ------------------------------------------------------------------ chip types (owned by Alice)
         $repas      = $this->createChipType('Repas', '#22c55e', $aliceEmail);
@@ -89,6 +92,31 @@ class AppFixtures extends Fixture
             colors: ['#a8a29e', '#f5f5f4'],
         );
         $this->catRepository->save($mochi);
+
+        // ------------------------------------------------------------------ cats (owned by Charlie)
+        $nala = Cat::add(
+            id: CatId::generate(),
+            name: new CatName('Nala'),
+            ownerId: $charlieEmail,
+            weight: 3.5,
+            breed: 'Siamese',
+            colors: ['#f5deb3', '#8b7355'],
+        );
+        $this->catRepository->save($nala);
+
+        $oreo = Cat::add(
+            id: CatId::generate(),
+            name: new CatName('Oreo'),
+            ownerId: $charlieEmail,
+            weight: 5.1,
+            breed: 'Tuxedo',
+            colors: ['#000000', '#ffffff'],
+        );
+        $this->catRepository->save($oreo);
+
+        // ------------------------------------------------------------------ chip types (owned by Charlie)
+        $this->createChipType('Repas', '#22c55e', $charlieEmail);
+        $this->createChipType('Câlin', '#ec4899', $charlieEmail);
 
         // ------------------------------------------------------------------ weight history (6 months, bi-weekly)
         $this->seedWeightHistory($ziggy->id(), [

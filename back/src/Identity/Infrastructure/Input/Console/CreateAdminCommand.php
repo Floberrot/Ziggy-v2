@@ -35,7 +35,6 @@ final class CreateAdminCommand extends Command
     {
         $this
             ->addArgument('email', InputArgument::REQUIRED, 'Admin email')
-            ->addArgument('password', InputArgument::REQUIRED, 'Admin plain password')
             ->addArgument('username', InputArgument::OPTIONAL, 'Admin username (defaults to email local part)');
     }
 
@@ -45,9 +44,7 @@ final class CreateAdminCommand extends Command
 
         /** @var string $emailArg */
         $emailArg = $input->getArgument('email');
-        /** @var string $passwordArg */
-        $passwordArg = $input->getArgument('password');
-        /** @var string $usernameArg */
+        /** @var string|null $usernameArg */
         $usernameArg = $input->getArgument('username');
 
         try {
@@ -64,11 +61,19 @@ final class CreateAdminCommand extends Command
             return Command::FAILURE;
         }
 
+        $plainPassword = $io->askHidden('Admin password (hidden):');
+
+        if (null === $plainPassword || '' === $plainPassword) {
+            $io->error('Password cannot be empty.');
+
+            return Command::FAILURE;
+        }
+
         $userId = UserId::generate();
 
         $hashedPassword = $this->passwordHasher->hashPassword(
             new InMemoryUser($emailArg, ''),
-            $passwordArg,
+            $plainPassword,
         );
 
         $admin = User::register(

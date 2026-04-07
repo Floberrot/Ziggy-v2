@@ -253,6 +253,20 @@ const { mutate: removeChip, isPending: removing } = useMutation({
   <MainTemplate>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
+      <!-- Admin warning banner -->
+      <div
+        v-if="me?.role === 'ROLE_ADMIN'"
+        class="mb-4 flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-amber-400"
+      >
+        <span class="text-lg">⚠️</span>
+        <div class="flex-1 text-sm">
+          <span class="font-semibold">You are logged in as Administrator.</span>
+          <span class="ml-2 text-amber-400/70">Data shown is for your admin account. Use the</span>
+          <RouterLink to="/admin" class="ml-1 underline hover:text-amber-300">Admin Panel</RouterLink>
+          <span class="text-amber-400/70"> to manage all users and resources.</span>
+        </div>
+      </div>
+
       <!-- Cat selector row + quick links -->
       <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
         <!-- Cat pills -->

@@ -35,6 +35,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Calendar/Infrastructure/Output/Persistence'
                 prefix: 'App\Calendar\Infrastructure\Output\Persistence'
                 alias: Calendar
+            Admin:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Admin/Infrastructure/Output/Persistence'
+                prefix: 'App\Admin\Infrastructure\Output\Persistence'
+                alias: Admin
         controller_resolver:
             auto_mapping: false
 

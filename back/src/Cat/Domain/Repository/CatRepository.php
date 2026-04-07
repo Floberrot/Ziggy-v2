@@ -19,5 +19,10 @@ interface CatRepository
     /** @return list<Cat> */
     public function findAll(): array;
 
+    /** @return list<Cat> */
+    public function findAllPaginated(int $page, int $limit): array;
+
+    public function countAll(): int;
+
     public function remove(CatId $id): void;
 }

@@ -16,5 +16,13 @@ interface ChipTypeRepository
     /** @return list<ChipType> */
     public function findByOwnerId(string $ownerId): array;
 
+    /** @return list<ChipType> */
+    public function findAll(): array;
+
+    /** @return list<ChipType> */
+    public function findAllPaginated(int $page, int $limit): array;
+
+    public function countAll(): int;
+
     public function remove(ChipTypeId $id): void;
 }

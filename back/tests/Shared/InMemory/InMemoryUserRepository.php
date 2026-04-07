@@ -40,4 +40,22 @@ final class InMemoryUserRepository implements UserRepository
     {
         return array_values($this->store);
     }
+
+    /** @return list<User> */
+    public function findAllPaginated(int $page, int $limit): array
+    {
+        $all = array_values($this->store);
+
+        return array_slice($all, ($page - 1) * $limit, $limit);
+    }
+
+    public function countAll(): int
+    {
+        return count($this->store);
+    }
+
+    public function remove(UserId $id): void
+    {
+        unset($this->store[$id->value()]);
+    }
 }

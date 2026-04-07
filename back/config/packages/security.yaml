@@ -33,6 +33,7 @@ security:
         - { path: ^/api/auth/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/invitation/accept, roles: PUBLIC_ACCESS }
         - { path: ^/api/auth/password-reset, roles: PUBLIC_ACCESS }
+        - { path: ^/api/admin/auth/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/admin, roles: ROLE_ADMIN }
         - { path: ^/api, roles: ROLE_USER }
 

@@ -65,6 +65,23 @@ final readonly class DoctrineCatRepository implements CatRepository
         return array_map($this->toDomain(...), $entities);
     }
 
+    /** @return list<Cat> */
+    public function findAllPaginated(int $page, int $limit): array
+    {
+        $entities = $this->entityManager->getRepository(CatOrmEntity::class)
+            ->findBy([], ['createdAt' => 'DESC'], $limit, ($page - 1) * $limit);
+
+        return array_map($this->toDomain(...), $entities);
+    }
+
+    public function countAll(): int
+    {
+        /** @var int $count */
+        $count = $this->entityManager->getRepository(CatOrmEntity::class)->count([]);
+
+        return $count;
+    }
+
     public function remove(CatId $id): void
     {
         $entity = $this->entityManager->find(CatOrmEntity::class, $id->value());

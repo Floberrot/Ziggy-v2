@@ -18,4 +18,11 @@ interface UserRepository
 
     /** @return list<User> */
     public function findAll(): array;
+
+    /** @return list<User> */
+    public function findAllPaginated(int $page, int $limit): array;
+
+    public function countAll(): int;
+
+    public function remove(UserId $id): void;
 }
