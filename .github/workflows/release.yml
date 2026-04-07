@@ -1,0 +1,100 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows: ["Deploy — Production"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: "Create Release"
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute next tag
+        id: tag
+        run: |
+          LAST=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+
+          if [ -z "$LAST" ]; then
+            NEXT="v1.0.0"
+            BASE=""
+            BUMP="initial"
+          else
+            IFS='.' read -r MAJOR MINOR PATCH <<< "${LAST#v}"
+            BASE="$LAST"
+
+            # Collect subject + body of every commit since last tag
+            COMMITS_RAW=$(git log "${BASE}..HEAD" --pretty=format:"%s%n%b")
+
+            # feat / feat! / BREAKING CHANGE → major
+            # fix / refactor → minor
+            # docs / chore / ci / test / style / perf / anything else → patch
+            BUMP="patch"
+            if echo "$COMMITS_RAW" | grep -qE '^feat(\(|!|:)'; then
+              BUMP="major"
+            elif echo "$COMMITS_RAW" | grep -qiE '^BREAKING CHANGE'; then
+              BUMP="major"
+            elif echo "$COMMITS_RAW" | grep -qE '^(fix|refactor)(\(|:)'; then
+              BUMP="minor"
+            fi
+
+            case $BUMP in
+              major) NEXT="v$((MAJOR + 1)).0.0" ;;
+              minor) NEXT="v${MAJOR}.$((MINOR + 1)).0" ;;
+              patch) NEXT="v${MAJOR}.${MINOR}.$((PATCH + 1))" ;;
+            esac
+          fi
+
+          echo "next=$NEXT" >> $GITHUB_OUTPUT
+          echo "base=$BASE" >> $GITHUB_OUTPUT
+          echo "bump=$BUMP" >> $GITHUB_OUTPUT
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          BASE="${{ steps.tag.outputs.base }}"
+          BUMP="${{ steps.tag.outputs.bump }}"
+
+          if [ -z "$BASE" ]; then
+            RANGE="HEAD"
+            DIFF_BASE=$(git rev-list --max-parents=0 HEAD)
+          else
+            RANGE="${BASE}..HEAD"
+            DIFF_BASE="$BASE"
+          fi
+
+          COMMITS=$(git log $RANGE --pretty=format:"- %s (%h)" 2>/dev/null || echo "- Initial release")
+          DIFFSTAT=$(git diff --stat "${DIFF_BASE}..HEAD" 2>/dev/null || echo "")
+
+          NOTES="## Release ${{ steps.tag.outputs.next }}"$'\n\n'
+          NOTES+="**Version bump:** \`${BUMP}\`"$'\n\n'
+          NOTES+="### Commits"$'\n'"${COMMITS}"$'\n\n'
+          if [ -n "$DIFFSTAT" ]; then
+            NOTES+="### Files changed"$'\n\n'"${DIFFSTAT}"
+          fi
+
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES"     >> $GITHUB_OUTPUT
+          echo "EOF"        >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        run: |
+          git tag ${{ steps.tag.outputs.next }}
+          git push origin ${{ steps.tag.outputs.next }}
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ steps.tag.outputs.next }} \
+            --title "Release ${{ steps.tag.outputs.next }}" \
+            --notes "${{ steps.notes.outputs.notes }}"
