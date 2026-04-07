@@ -55,6 +55,31 @@ final readonly class DoctrineChipTypeRepository implements ChipTypeRepository
         return array_map($this->toDomain(...), $entities);
     }
 
+    /** @return list<ChipType> */
+    public function findAll(): array
+    {
+        $entities = $this->entityManager->getRepository(ChipTypeOrmEntity::class)->findAll();
+
+        return array_map($this->toDomain(...), $entities);
+    }
+
+    /** @return list<ChipType> */
+    public function findAllPaginated(int $page, int $limit): array
+    {
+        $entities = $this->entityManager->getRepository(ChipTypeOrmEntity::class)
+            ->findBy([], ['createdAt' => 'DESC'], $limit, ($page - 1) * $limit);
+
+        return array_map($this->toDomain(...), $entities);
+    }
+
+    public function countAll(): int
+    {
+        /** @var int $count */
+        $count = $this->entityManager->getRepository(ChipTypeOrmEntity::class)->count([]);
+
+        return $count;
+    }
+
     public function remove(ChipTypeId $id): void
     {
         $entity = $this->entityManager->find(ChipTypeOrmEntity::class, $id->value());

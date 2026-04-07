@@ -21,7 +21,7 @@ final readonly class DeclineInvitationHandler
         $invitation = $this->invitationRepository->findByToken($command->token);
 
         if (null === $invitation) {
-            throw new InvitationNotFoundException();
+            throw new InvitationNotFoundException($command->token);
         }
 
         $invitation->decline();

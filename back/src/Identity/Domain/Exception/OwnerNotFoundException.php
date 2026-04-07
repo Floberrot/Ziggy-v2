@@ -8,8 +8,8 @@ use App\Shared\Domain\Exception\NotFoundException;
 
 final class OwnerNotFoundException extends NotFoundException
 {
-    public function __construct()
+    public function __construct(string $email)
     {
-        parent::__construct('Owner not found.');
+        parent::__construct(sprintf('Owner with email "%s" not found.', $email));
     }
 }

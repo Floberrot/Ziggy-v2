@@ -8,8 +8,8 @@ use App\Shared\Domain\Exception\BusinessRuleException;
 
 final class ResetTokenExpiredException extends BusinessRuleException
 {
-    public function __construct()
+    public function __construct(string $token)
     {
-        parent::__construct('This reset link has expired.');
+        parent::__construct(sprintf('Reset token "%s" has expired.', $token));
     }
 }

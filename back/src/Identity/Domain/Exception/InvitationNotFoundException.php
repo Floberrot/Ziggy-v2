@@ -8,8 +8,8 @@ use App\Shared\Domain\Exception\NotFoundException;
 
 final class InvitationNotFoundException extends NotFoundException
 {
-    public function __construct()
+    public function __construct(string $token)
     {
-        parent::__construct('Invitation not found.');
+        parent::__construct(sprintf('Invitation with token "%s" not found.', $token));
     }
 }

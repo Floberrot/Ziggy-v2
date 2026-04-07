@@ -27,17 +27,17 @@ final readonly class UpdatePetSitterHandler
         $owner = $this->userRepository->findByEmail(new Email($command->ownerEmail));
 
         if (null === $owner) {
-            throw new OwnerNotFoundException();
+            throw new OwnerNotFoundException($command->ownerEmail);
         }
 
         $petSitter = $this->petSitterRepository->findById(new PetSitterId($command->petSitterId));
 
         if (null === $petSitter) {
-            throw new PetSitterNotFoundException();
+            throw new PetSitterNotFoundException($command->petSitterId);
         }
 
         if (!$petSitter->ownerId()->equals($owner->id())) {
-            throw new PetSitterNotFoundException();
+            throw new PetSitterNotFoundException($command->petSitterId);
         }
 
         $petSitter->updateData(

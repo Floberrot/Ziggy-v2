@@ -26,17 +26,17 @@ final readonly class RevokeInvitationHandler
         $owner = $this->userRepository->findByEmail(new Email($command->ownerEmail));
 
         if (null === $owner) {
-            throw new OwnerNotFoundException();
+            throw new OwnerNotFoundException($command->ownerEmail);
         }
 
         $invitation = $this->invitationRepository->findById($command->invitationId);
 
         if (null === $invitation || $invitation->ownerId()->value() !== $owner->id()->value()) {
-            throw new InvitationNotFoundException();
+            throw new InvitationNotFoundException($command->invitationId);
         }
 
         if ($invitation->isAccepted()) {
-            throw new CannotRevokeAcceptedInvitationException();
+            throw new CannotRevokeAcceptedInvitationException($command->invitationId);
         }
 
         $this->invitationRepository->remove($command->invitationId);

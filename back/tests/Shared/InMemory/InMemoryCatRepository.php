@@ -40,6 +40,19 @@ final class InMemoryCatRepository implements CatRepository
         return array_values($this->store);
     }
 
+    /** @return list<Cat> */
+    public function findAllPaginated(int $page, int $limit): array
+    {
+        $all = array_values($this->store);
+
+        return array_slice($all, ($page - 1) * $limit, $limit);
+    }
+
+    public function countAll(): int
+    {
+        return count($this->store);
+    }
+
     public function remove(CatId $id): void
     {
         unset($this->store[$id->value()]);

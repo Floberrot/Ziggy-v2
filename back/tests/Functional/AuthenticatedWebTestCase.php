@@ -11,15 +11,22 @@ abstract class AuthenticatedWebTestCase extends WebTestCase
 {
     private static ?string $cachedToken = null;
     private static ?string $cachedUserId = null;
+    private static ?string $cachedAdminToken = null;
     private static string $testEmail = 'testowner@functional.test';
     private static string $testPassword = 'FunctionalPass1!';
     private static string $testUsername = 'functionalowner';
+
+    private static string $adminEmail = 'testadmin@functional.test';
+    private static string $adminPassword = 'AdminPass1!';
+    private static string $adminUsername = 'functionaladmin';
+    private static string $adminSecret = 'change_me';
 
     protected function setUp(): void
     {
         parent::setUp();
         self::$cachedToken = null;
         self::$cachedUserId = null;
+        self::$cachedAdminToken = null;
     }
 
     protected function createAuthenticatedClient(): KernelBrowser
@@ -27,6 +34,18 @@ abstract class AuthenticatedWebTestCase extends WebTestCase
         $client = static::createClient();
 
         $token = $this->getAuthToken($client);
+
+        $client->setServerParameter('HTTP_Authorization', 'Bearer ' . $token);
+        $client->setServerParameter('CONTENT_TYPE', 'application/json');
+
+        return $client;
+    }
+
+    protected function createAdminClient(): KernelBrowser
+    {
+        $client = static::createClient();
+
+        $token = $this->getAdminToken($client);
 
         $client->setServerParameter('HTTP_Authorization', 'Bearer ' . $token);
         $client->setServerParameter('CONTENT_TYPE', 'application/json');
@@ -63,6 +82,54 @@ abstract class AuthenticatedWebTestCase extends WebTestCase
         return self::$cachedToken;
     }
 
+    protected function getAdminToken(KernelBrowser $client): string
+    {
+        if (null !== self::$cachedAdminToken) {
+            return self::$cachedAdminToken;
+        }
+
+        // Create an admin user via the console command approach (use the repository directly)
+        $container = static::getContainer();
+        /** @var \App\Identity\Domain\Repository\UserRepository $userRepository */
+        $userRepository = $container->get(\App\Identity\Domain\Repository\UserRepository::class);
+        /** @var \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $hasher */
+        $hasher = $container->get(\Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface::class);
+
+        $existingUser = $userRepository->findByEmail(new \App\Identity\Domain\Model\Email(self::$adminEmail));
+
+        if (null === $existingUser) {
+            $hashedPassword = $hasher->hashPassword(
+                new \Symfony\Component\Security\Core\User\InMemoryUser(self::$adminEmail, ''),
+                self::$adminPassword,
+            );
+
+            $admin = \App\Identity\Domain\Model\User::register(
+                id: \App\Identity\Domain\Model\UserId::generate(),
+                email: new \App\Identity\Domain\Model\Email(self::$adminEmail),
+                hashedPassword: $hashedPassword,
+                role: \App\Identity\Domain\Model\Role::ADMIN,
+                username: self::$adminUsername,
+            );
+
+            $userRepository->save($admin);
+        }
+
+        $client->request('POST', '/api/admin/auth/login', [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode([
+            'email' => self::$adminEmail,
+            'password' => self::$adminPassword,
+            'adminSecret' => self::$adminSecret,
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $client->getResponse();
+        /** @var array{token: string} $data */
+        $data = json_decode($response->getContent() ?: '{}', true, 512, JSON_THROW_ON_ERROR);
+        self::$cachedAdminToken = $data['token'];
+
+        return self::$cachedAdminToken;
+    }
+
     protected function getTestEmail(): string
     {
         return self::$testEmail;
@@ -72,6 +139,7 @@ abstract class AuthenticatedWebTestCase extends WebTestCase
     {
         self::$cachedToken = null;
         self::$cachedUserId = null;
+        self::$cachedAdminToken = null;
         parent::tearDownAfterClass();
     }
 }

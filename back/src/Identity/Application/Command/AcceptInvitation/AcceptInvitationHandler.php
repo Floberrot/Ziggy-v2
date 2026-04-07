@@ -36,15 +36,15 @@ final readonly class AcceptInvitationHandler
         $invitation = $this->invitationRepository->findByToken($command->token);
 
         if (null === $invitation) {
-            throw new InvitationNotFoundException();
+            throw new InvitationNotFoundException($command->token);
         }
 
         if ($invitation->isExpired()) {
-            throw new InvitationExpiredException();
+            throw new InvitationExpiredException($command->token);
         }
 
         if ($invitation->isAccepted()) {
-            throw new InvitationAlreadyAcceptedException();
+            throw new InvitationAlreadyAcceptedException($command->token);
         }
 
         if (null !== $this->userRepository->findByEmail($invitation->inviteeEmail())) {

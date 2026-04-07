@@ -68,15 +68,15 @@ final class Invitation
     public function decline(): void
     {
         if ($this->accepted) {
-            throw new InvitationAlreadyAcceptedException();
+            throw new InvitationAlreadyAcceptedException($this->token);
         }
 
         if ($this->isExpired()) {
-            throw new InvitationExpiredException();
+            throw new InvitationExpiredException($this->token);
         }
 
         if ($this->declined) {
-            throw new InvitationAlreadyDeclinedException();
+            throw new InvitationAlreadyDeclinedException($this->token);
         }
 
         $this->declined = true;

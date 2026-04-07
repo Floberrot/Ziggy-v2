@@ -68,6 +68,34 @@ final readonly class DoctrineUserRepository implements UserRepository
         return array_map($this->toDomain(...), $entities);
     }
 
+    /** @return list<User> */
+    public function findAllPaginated(int $page, int $limit): array
+    {
+        $entities = $this->entityManager->getRepository(UserOrmEntity::class)
+            ->findBy([], ['createdAt' => 'DESC'], $limit, ($page - 1) * $limit);
+
+        return array_map($this->toDomain(...), $entities);
+    }
+
+    public function countAll(): int
+    {
+        /** @var int $count */
+        $count = $this->entityManager->getRepository(UserOrmEntity::class)
+            ->count([]);
+
+        return $count;
+    }
+
+    public function remove(UserId $id): void
+    {
+        $entity = $this->entityManager->find(UserOrmEntity::class, $id->value());
+
+        if (null !== $entity) {
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
+        }
+    }
+
     private function toDomain(UserOrmEntity $entity): User
     {
         return User::reconstitute(

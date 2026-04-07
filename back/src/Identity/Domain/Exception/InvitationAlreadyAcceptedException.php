@@ -8,8 +8,8 @@ use App\Shared\Domain\Exception\BusinessRuleException;
 
 final class InvitationAlreadyAcceptedException extends BusinessRuleException
 {
-    public function __construct()
+    public function __construct(string $token)
     {
-        parent::__construct('This invitation has already been accepted.');
+        parent::__construct(sprintf('Invitation with token "%s" has already been accepted.', $token));
     }
 }

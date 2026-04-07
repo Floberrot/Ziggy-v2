@@ -28,7 +28,7 @@ final readonly class SendInvitationHandler
         $owner = $this->userRepository->findByEmail(new Email($command->ownerEmail));
 
         if (null === $owner) {
-            throw new OwnerNotFoundException();
+            throw new OwnerNotFoundException($command->ownerEmail);
         }
 
         $invitation = Invitation::create(
