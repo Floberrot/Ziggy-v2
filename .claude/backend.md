@@ -35,6 +35,7 @@ The Domain layer contains **all business logic**. It has zero dependencies on Sy
 **Rules:**
 - Entities and Aggregates encapsulate state and enforce invariants
 - Value Objects are immutable; compare by value, not identity
+- **Never duplicate Value Object logic across bounded contexts** — shared primitives (UUID-based IDs, emails, etc.) must live in `Shared/Domain/ValueObject/` and be reused. Never create `UserId`, `PetSitterId`, `OwnerId` as separate classes with identical implementation; create one `Uuid` base class in `Shared` and extend or alias it.
 - Domain Events are raised inside Aggregates when something meaningful happens
 - Repository interfaces are defined here as ports — never implemented here
 - Domain Services handle logic that doesn't belong to a single entity

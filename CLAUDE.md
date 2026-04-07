@@ -25,6 +25,7 @@ Stack: **Symfony UX · Vue 3 · FrankenPHP · Docker**
 - **Dependencies point inward**: Infrastructure → Application → Domain
 - **Domain is pure PHP**: no Symfony, no Doctrine, no framework anywhere in Domain
 - **One bounded context per top-level namespace** under `src/`
+- **Never duplicate Value Object logic across bounded contexts** — shared primitives (UUID IDs, emails, etc.) belong in `Shared/Domain/ValueObject/`. Never create `UserId`, `PetSitterId`, `OwnerId` as separate classes with identical logic; define a shared `Uuid` base class and reuse it.
 - **Commands mutate state; Queries return data** — never mix the two
 - **Handlers are thin**: orchestrate only, delegate logic to Domain services injected via DI
 - **A handler performs exactly one action — the one its name describes** (e.g. `RegisterOwnerHandler` registers the owner, nothing else). Any subsequent side-effect (send email, update a related aggregate, notify, log a business event) must be triggered by a Domain Event and handled in a dedicated `EventHandler`. Never chain multiple responsibilities inside a single handler.
@@ -40,6 +41,8 @@ Stack: **Symfony UX · Vue 3 · FrankenPHP · Docker**
 - Use `final` classes wherever possible
 - Use `readonly` on class level when all properties are readonly — do not add `readonly` to individual properties of a `readonly class`
 - No mixed types anywhere
+- **Never wrap `new` in parentheses for chaining** — use `new Foo()->method()` not `(new Foo())->method()`. PHP 8.4 supports direct property and method access on `new` expressions.
+- **Never write getter methods that only return a property value** — declare the property `public` (or `public readonly`) instead. A method like `public function getId(): string { return $this->id; }` adds zero value over `public string $id`.
 
 ### Controllers
 - **Controllers must use `#[MapRequestPayload]`** to receive a typed request object — never parse `$request->getContent()` manually
