@@ -11,7 +11,7 @@ final class DeleteUserControllerTest extends AuthenticatedWebTestCase
     public function testAdminCanDeleteUser(): void
     {
         // Create a user to delete
-        $regularClient = static::createClient();
+        $regularClient = $this->getTestClient();
         $regularClient->request('POST', '/api/auth/register', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([

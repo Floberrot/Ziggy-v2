@@ -44,8 +44,8 @@ final class AdminLoginControllerTest extends AuthenticatedWebTestCase
 
     public function testAdminLoginSucceeds(): void
     {
+        $client = $this->getTestClient();
         $this->createAdminUser();
-        $client = static::createClient();
 
         $client->request('POST', '/api/admin/auth/login', [], [], [
             'CONTENT_TYPE' => 'application/json',
@@ -65,8 +65,8 @@ final class AdminLoginControllerTest extends AuthenticatedWebTestCase
 
     public function testAdminLoginFailsWithWrongAdminSecret(): void
     {
+        $client = $this->getTestClient();
         $this->createAdminUser();
-        $client = static::createClient();
 
         $client->request('POST', '/api/admin/auth/login', [], [], [
             'CONTENT_TYPE' => 'application/json',
@@ -81,8 +81,8 @@ final class AdminLoginControllerTest extends AuthenticatedWebTestCase
 
     public function testAdminLoginFailsWithWrongPassword(): void
     {
+        $client = $this->getTestClient();
         $this->createAdminUser();
-        $client = static::createClient();
 
         $client->request('POST', '/api/admin/auth/login', [], [], [
             'CONTENT_TYPE' => 'application/json',

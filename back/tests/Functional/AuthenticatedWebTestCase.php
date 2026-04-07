@@ -12,6 +12,7 @@ abstract class AuthenticatedWebTestCase extends WebTestCase
     private static ?string $cachedToken = null;
     private static ?string $cachedUserId = null;
     private static ?string $cachedAdminToken = null;
+    private ?KernelBrowser $testClient = null;
     private static string $testEmail = 'testowner@functional.test';
     private static string $testPassword = 'FunctionalPass1!';
     private static string $testUsername = 'functionalowner';
@@ -29,9 +30,18 @@ abstract class AuthenticatedWebTestCase extends WebTestCase
         self::$cachedAdminToken = null;
     }
 
+    protected function getTestClient(): KernelBrowser
+    {
+        if (null === $this->testClient) {
+            $this->testClient = static::createClient();
+        }
+
+        return $this->testClient;
+    }
+
     protected function createAuthenticatedClient(): KernelBrowser
     {
-        $client = static::createClient();
+        $client = $this->getTestClient();
 
         $token = $this->getAuthToken($client);
 
@@ -43,7 +53,7 @@ abstract class AuthenticatedWebTestCase extends WebTestCase
 
     protected function createAdminClient(): KernelBrowser
     {
-        $client = static::createClient();
+        $client = $this->getTestClient();
 
         $token = $this->getAdminToken($client);
 
