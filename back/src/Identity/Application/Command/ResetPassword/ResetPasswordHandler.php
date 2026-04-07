@@ -29,15 +29,15 @@ final readonly class ResetPasswordHandler
         $resetToken = $this->passwordResetTokenRepository->findByToken($command->token);
 
         if (null === $resetToken) {
-            throw new InvalidPasswordResetTokenException();
+            throw new InvalidPasswordResetTokenException($command->token);
         }
 
         if ($resetToken->isUsed()) {
-            throw new ResetTokenAlreadyUsedException();
+            throw new ResetTokenAlreadyUsedException($command->token);
         }
 
         if ($resetToken->isExpired()) {
-            throw new ResetTokenExpiredException();
+            throw new ResetTokenExpiredException($command->token);
         }
 
         $user = $this->userRepository->findByEmail($resetToken->email());

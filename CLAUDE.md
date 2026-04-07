@@ -135,6 +135,10 @@ Full lifecycle enforced:
 | Dockerfile, multi-stage build, docker-compose | `docker-containerization` |
 | Docker CLI commands | `docker-cli` |
 
+### Update Coding Rules
+When a bad practice is spotted, a recurring mistake is identified, a rule is missing, or the user says **"add this to the rules"**, **"we should always/never"**, or **"make sure we don't do this again"**:
+→ **invoke `update-coding-rules`**
+
 ---
 
 ## Architectural Reminders (quick reference)

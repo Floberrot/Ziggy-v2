@@ -8,6 +8,7 @@ use App\Identity\Domain\Model\UserId;
 use App\Identity\Domain\Repository\PetSitterRepository;
 use App\Identity\Domain\Repository\UserRepository;
 use App\Shared\Application\DTO\PaginatedResult;
+use DateTimeInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(bus: 'query.bus')]
@@ -24,20 +25,10 @@ final readonly class ListPetSittersAdminHandler
         $petSitters = $this->petSitterRepository->findAllPaginated($query->page, $query->limit);
         $total = $this->petSitterRepository->countAll();
 
-        // Batch-load owners by unique UUIDs to avoid N+1
-        $ownerIds = array_unique(array_map(static fn ($ps) => $ps->ownerId()->value(), $petSitters));
-        $ownersByUuid = [];
-        foreach ($ownerIds as $uuid) {
-            $owner = $this->userRepository->findById(new UserId($uuid));
-            if (null !== $owner) {
-                $ownersByUuid[$uuid] = $owner;
-            }
-        }
+        $items = array_map(function ($ps) {
+            $owner = $this->userRepository->findById($ps->ownerId());
 
-        $items = array_map(static function ($ps) use ($ownersByUuid) {
-            $owner = $ownersByUuid[$ps->ownerId()->value()] ?? null;
-
-            return (new PetSitterAdminView(
+            return new PetSitterAdminView(
                 id: $ps->id()->value(),
                 ownerId: $ps->ownerId()->value(),
                 ownerEmail: $owner?->email()->value(),
@@ -47,8 +38,8 @@ final readonly class ListPetSittersAdminHandler
                 type: $ps->type()->value,
                 age: $ps->age(),
                 phoneNumber: $ps->phoneNumber(),
-                createdAt: $ps->createdAt()->format(\DateTimeInterface::ATOM),
-            ))->toArray();
+                createdAt: $ps->createdAt()->format(DateTimeInterface::ATOM),
+            )->toArray();
         }, $petSitters);
 
         return new PaginatedResult(

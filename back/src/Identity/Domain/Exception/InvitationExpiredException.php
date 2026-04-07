@@ -8,8 +8,8 @@ use App\Shared\Domain\Exception\BusinessRuleException;
 
 final class InvitationExpiredException extends BusinessRuleException
 {
-    public function __construct()
+    public function __construct(string $token)
     {
-        parent::__construct('This invitation has expired.');
+        parent::__construct(sprintf('Invitation with token "%s" has expired.', $token));
     }
 }

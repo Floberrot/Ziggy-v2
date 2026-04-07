@@ -25,7 +25,7 @@ final readonly class UpdateOwnerProfileHandler
         $user = $this->userRepository->findByEmail(new Email($command->ownerEmail));
 
         if (null === $user) {
-            throw new OwnerNotFoundException();
+            throw new OwnerNotFoundException($command->ownerEmail);
         }
 
         $profile = $this->ownerProfileRepository->findByUserId($user->id())

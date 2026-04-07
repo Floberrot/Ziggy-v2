@@ -8,8 +8,8 @@ use App\Shared\Domain\Exception\NotFoundException;
 
 final class PetSitterNotFoundException extends NotFoundException
 {
-    public function __construct()
+    public function __construct(string $petSitterId)
     {
-        parent::__construct('Pet sitter not found.');
+        parent::__construct(sprintf('Pet sitter "%s" not found.', $petSitterId));
     }
 }

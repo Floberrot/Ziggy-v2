@@ -8,8 +8,8 @@ use App\Shared\Domain\Exception\BusinessRuleException;
 
 final class CannotRevokeAcceptedInvitationException extends BusinessRuleException
 {
-    public function __construct()
+    public function __construct(string $invitationId)
     {
-        parent::__construct('Cannot revoke an already accepted invitation.');
+        parent::__construct(sprintf('Cannot revoke already accepted invitation "%s".', $invitationId));
     }
 }

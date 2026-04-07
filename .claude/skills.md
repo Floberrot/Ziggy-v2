@@ -81,6 +81,14 @@
 |---|---|
 | User asks to "make a plan and execute it", "plan and ship", or any variant | `plan-and-ship` |
 
+---
+
+## Update Coding Rules
+
+| Situation | Skill |
+|---|---|
+| Bad practice spotted, missing rule identified, "add this to the rules", recurring mistake | `update-coding-rules` |
+
 **Key rules:**
 - Always enter plan mode and get explicit approval before writing code
 - Run `phpcbf` → `phpcs` → `phpstan` → `deptrac` → `vue-tsc` in order; fix all errors before the next tool

@@ -2,7 +2,7 @@ import router from '../router'
 import { useAuthStore } from '../stores/useAuthStore'
 import { useUiStore } from '../stores/useUiStore'
 
-const BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? '/api'
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 
 let handlingExpiry = false
 

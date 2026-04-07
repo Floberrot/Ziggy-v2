@@ -142,7 +142,7 @@ type-check: ## Run TypeScript type checking
 
 .PHONY: phpstan
 phpstan: ## Run PHPStan static analysis
-	$(APP) vendor/bin/phpstan analyse
+	$(APP) vendor/bin/phpstan analyse --memory-limit=512M
 
 .PHONY: phpcs
 phpcs: ## Run PHP_CodeSniffer (style check)

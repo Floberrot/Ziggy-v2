@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Throwable;
 
 final readonly class ExceptionListener implements EventSubscriberInterface
 {
@@ -72,7 +73,7 @@ final readonly class ExceptionListener implements EventSubscriberInterface
                 message: $exception->getMessage(),
                 exception: $exception,
             );
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // Never let log persistence crash the response
         }
 

@@ -33,7 +33,7 @@ final readonly class CreatePetSitterHandler
         $owner = $this->userRepository->findByEmail(new Email($command->ownerEmail));
 
         if (null === $owner) {
-            throw new OwnerNotFoundException();
+            throw new OwnerNotFoundException($command->ownerEmail);
         }
 
         $petSitter = PetSitter::create(

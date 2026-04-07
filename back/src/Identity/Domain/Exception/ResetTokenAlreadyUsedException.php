@@ -8,8 +8,8 @@ use App\Shared\Domain\Exception\BusinessRuleException;
 
 final class ResetTokenAlreadyUsedException extends BusinessRuleException
 {
-    public function __construct()
+    public function __construct(string $token)
     {
-        parent::__construct('This reset link has already been used.');
+        parent::__construct(sprintf('Reset token "%s" has already been used.', $token));
     }
 }

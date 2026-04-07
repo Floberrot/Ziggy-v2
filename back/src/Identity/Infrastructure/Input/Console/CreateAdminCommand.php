@@ -63,7 +63,7 @@ final class CreateAdminCommand extends Command
 
         $plainPassword = $io->askHidden('Admin password (hidden):');
 
-        if (null === $plainPassword || '' === $plainPassword) {
+        if ('' === $plainPassword || !is_string($plainPassword)) {
             $io->error('Password cannot be empty.');
 
             return Command::FAILURE;
