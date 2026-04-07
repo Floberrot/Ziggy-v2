@@ -26,7 +26,7 @@ final readonly class ListCatsAdminHandler
         $cats = $this->catRepository->findAllPaginated($query->page, $query->limit);
         $total = $this->catRepository->countAll();
 
-        $items = array_map(function ($cat){
+        $items = array_map(function ($cat) {
             $owner = $this->userRepository->findById(new UserId($cat->ownerId()));
 
             return new CatAdminView(
