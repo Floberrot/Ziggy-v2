@@ -68,3 +68,26 @@ export interface AdminLogFilters {
   logLevel?: string
   search?: string
 }
+
+export interface ActivityLog {
+  id: string
+  method: string
+  path: string
+  statusCode: number
+  userId: string | null
+  ip: string | null
+  createdAt: string
+}
+
+export interface ActivityLogFilters {
+  page?: number
+  limit?: number
+  userId?: string
+  method?: string
+  search?: string
+}
+
+export interface FileLogResult {
+  lines: string[]
+  file: string
+}

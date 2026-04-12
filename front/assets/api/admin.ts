@@ -1,10 +1,13 @@
 import type {
+  ActivityLog,
+  ActivityLogFilters,
   AdminCat,
   AdminChipType,
   AdminLog,
   AdminLogFilters,
   AdminPetSitter,
   AdminUser,
+  FileLogResult,
   PaginatedResult,
 } from '../types/admin'
 
@@ -104,6 +107,25 @@ export const adminApi = {
       if (filters.search) params.set('search', filters.search)
 
       return adminRequest<PaginatedResult<AdminLog>>(`/admin/logs?${params.toString()}`)
+    },
+
+    appLogs: (lines = 200) =>
+      adminRequest<FileLogResult>(`/admin/logs/app?lines=${lines}`),
+
+    serverLogs: (lines = 200) =>
+      adminRequest<FileLogResult>(`/admin/logs/server?lines=${lines}`),
+  },
+
+  activityLogs: {
+    list: (filters: ActivityLogFilters = {}) => {
+      const params = new URLSearchParams()
+      if (filters.page) params.set('page', String(filters.page))
+      if (filters.limit) params.set('limit', String(filters.limit))
+      if (filters.userId) params.set('userId', filters.userId)
+      if (filters.method) params.set('method', filters.method)
+      if (filters.search) params.set('search', filters.search)
+
+      return adminRequest<PaginatedResult<ActivityLog>>(`/admin/activity-logs?${params.toString()}`)
     },
   },
 }

@@ -211,3 +211,58 @@ services:
     App\Identity\Infrastructure\Input\Http\ResetPasswordController:
         arguments:
             $commandBus: '@command.bus'
+
+    # ── Admin ─────────────────────────────────────────────────────────────────
+
+    App\Admin\Domain\Repository\AdminLogRepository:
+        alias: App\Admin\Infrastructure\Output\Persistence\DoctrineAdminLogRepository
+
+    App\Shared\Domain\Port\HttpErrorLogger:
+        alias: App\Admin\Infrastructure\Http\DoctrineHttpErrorLogger
+
+    App\Admin\Infrastructure\Input\Http\ListLogsController:
+        arguments:
+            $queryBus: '@query.bus'
+
+    App\Admin\Infrastructure\Input\Http\ListUsersController:
+        arguments:
+            $queryBus: '@query.bus'
+
+    App\Admin\Infrastructure\Input\Http\ListCatsAdminController:
+        arguments:
+            $queryBus: '@query.bus'
+
+    App\Admin\Infrastructure\Input\Http\ListChipTypesAdminController:
+        arguments:
+            $queryBus: '@query.bus'
+
+    App\Admin\Infrastructure\Input\Http\ListPetSittersAdminController:
+        arguments:
+            $queryBus: '@query.bus'
+
+    App\Admin\Infrastructure\Input\Http\DeleteUserController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Admin\Infrastructure\Input\Http\UpdateUserController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Admin\Infrastructure\Input\Http\DeleteCatAdminController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Admin\Infrastructure\Input\Http\DeleteChipTypeAdminController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Admin\Infrastructure\Input\Http\DeletePetSitterAdminController:
+        arguments:
+            $commandBus: '@command.bus'
+
+    App\Admin\Domain\Repository\ActivityLogRepository:
+        alias: App\Admin\Infrastructure\Output\Persistence\DoctrineActivityLogRepository
+
+    App\Admin\Infrastructure\Input\Http\ListActivityLogsController:
+        arguments:
+            $queryBus: '@query.bus'
