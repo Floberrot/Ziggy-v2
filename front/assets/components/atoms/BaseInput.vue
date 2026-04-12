@@ -10,8 +10,13 @@ const props = withDefaults(defineProps<{
   error?: string
   id?: string
 }>(), {
+  modelValue: undefined,
+  label: undefined,
   type: 'text',
+  placeholder: undefined,
   disabled: false,
+  error: undefined,
+  id: undefined,
 })
 
 defineEmits<{
@@ -26,12 +31,16 @@ defineExpose({ focus: () => inputEl.value?.focus() })
 
 <template>
   <div class="flex flex-col gap-1.5">
-    <label v-if="label" :for="inputId" class="text-sm font-medium text-[var(--text-2)]">
+    <label
+      v-if="label"
+      :for="inputId"
+      class="text-sm font-medium text-[var(--text-2)]"
+    >
       {{ label }}
     </label>
     <input
-      ref="inputEl"
       :id="inputId"
+      ref="inputEl"
       :type="type"
       :placeholder="placeholder"
       :disabled="disabled"
@@ -45,7 +54,10 @@ defineExpose({ focus: () => inputEl.value?.focus() })
         disabled && 'opacity-40 cursor-not-allowed',
       ]"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-    />
-    <span v-if="error" class="text-xs text-red-400">{{ error }}</span>
+    >
+    <span
+      v-if="error"
+      class="text-xs text-red-400"
+    >{{ error }}</span>
   </div>
 </template>

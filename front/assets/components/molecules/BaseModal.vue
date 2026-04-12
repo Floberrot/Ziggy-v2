@@ -39,14 +39,26 @@ onUnmounted(() => document.removeEventListener('keydown', handleKeydown))
           aria-modal="true"
         >
           <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-[var(--border)]">
-            <h2 class="text-base font-bold text-[var(--text)]">{{ title }}</h2>
+            <h2 class="text-base font-bold text-[var(--text)]">
+              {{ title }}
+            </h2>
             <button
               type="button"
               class="text-[var(--text-3)] hover:text-[var(--text-2)] transition-colors rounded-lg p-1 hover:bg-[var(--surface-3)]"
               @click="emit('close')"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>

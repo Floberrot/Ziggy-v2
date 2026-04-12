@@ -59,22 +59,49 @@ const yTicks = computed(() => {
 
 <template>
   <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
-    <h3 class="text-sm font-semibold text-[var(--text-2)] mb-4 uppercase tracking-wider">Weight evolution</h3>
+    <h3 class="text-sm font-semibold text-[var(--text-2)] mb-4 uppercase tracking-wider">
+      Weight evolution
+    </h3>
 
-    <div v-if="entries.length === 0" class="flex items-center justify-center h-32 text-[var(--text-3)] text-sm">
+    <div
+      v-if="entries.length === 0"
+      class="flex items-center justify-center h-32 text-[var(--text-3)] text-sm"
+    >
       No weight data recorded yet.
     </div>
 
-    <svg v-else :viewBox="`0 0 ${W} ${H}`" class="w-full" :style="{ height: '180px' }">
+    <svg
+      v-else
+      :viewBox="`0 0 ${W} ${H}`"
+      class="w-full"
+      :style="{ height: '180px' }"
+    >
       <defs>
-        <linearGradient id="wGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.25" />
-          <stop offset="100%" stop-color="#f43f5e" stop-opacity="0" />
+        <linearGradient
+          id="wGrad"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
+          <stop
+            offset="0%"
+            stop-color="#f43f5e"
+            stop-opacity="0.25"
+          />
+          <stop
+            offset="100%"
+            stop-color="#f43f5e"
+            stop-opacity="0"
+          />
         </linearGradient>
       </defs>
 
       <!-- Y axis ticks -->
-      <g v-for="tick in yTicks" :key="tick.weight">
+      <g
+        v-for="tick in yTicks"
+        :key="tick.weight"
+      >
         <line
           :x1="PADDING.left"
           :x2="W - PADDING.right"
@@ -95,7 +122,10 @@ const yTicks = computed(() => {
       </g>
 
       <!-- Area fill -->
-      <polygon :points="areaPoints" fill="url(#wGrad)" />
+      <polygon
+        :points="areaPoints"
+        fill="url(#wGrad)"
+      />
 
       <!-- Line -->
       <polyline
@@ -108,8 +138,16 @@ const yTicks = computed(() => {
       />
 
       <!-- Data points + X labels -->
-      <g v-for="(entry, i) in sorted" :key="entry.recordedAt">
-        <circle :cx="xPos(i)" :cy="yPos(entry.weight)" r="3.5" fill="#f43f5e" />
+      <g
+        v-for="(entry, i) in sorted"
+        :key="entry.recordedAt"
+      >
+        <circle
+          :cx="xPos(i)"
+          :cy="yPos(entry.weight)"
+          r="3.5"
+          fill="#f43f5e"
+        />
         <title>{{ entry.weight }} kg — {{ formatDate(entry.recordedAt) }}</title>
         <text
           v-if="sorted.length <= 8 || i === 0 || i === sorted.length - 1"

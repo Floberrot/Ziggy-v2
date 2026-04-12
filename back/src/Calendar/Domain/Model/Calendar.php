@@ -12,6 +12,9 @@ final class Calendar extends AggregateRoot
     /** @var list<Chip> */
     private array $chips = [];
 
+    /** @var list<string> */
+    private array $scheduledChipTypeIds = [];
+
     private function __construct(
         private readonly CalendarId $id,
         private readonly string $catId,
@@ -82,6 +85,37 @@ final class Calendar extends AggregateRoot
     public function setChips(array $chips): void
     {
         $this->chips = $chips;
+    }
+
+    /** @return list<string> */
+    public function scheduledChipTypeIds(): array
+    {
+        return $this->scheduledChipTypeIds;
+    }
+
+    /** @param list<string> $ids */
+    public function setScheduledChipTypeIds(array $ids): void
+    {
+        $this->scheduledChipTypeIds = $ids;
+    }
+
+    public function scheduleChipType(string $chipTypeId): void
+    {
+        if (in_array($chipTypeId, $this->scheduledChipTypeIds, true)) {
+            return;
+        }
+
+        $this->scheduledChipTypeIds[] = $chipTypeId;
+    }
+
+    public function unscheduleChipType(string $chipTypeId): void
+    {
+        $this->scheduledChipTypeIds = array_values(
+            array_filter(
+                $this->scheduledChipTypeIds,
+                static fn (string $id) => $id !== $chipTypeId,
+            )
+        );
     }
 
     public function removeChip(ChipId $chipId): void

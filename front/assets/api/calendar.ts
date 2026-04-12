@@ -13,4 +13,8 @@ export const calendarApi = {
     apiClient.post<void>(`/cats/${catId}/chips`, data),
   removeChip: (catId: string, chipId: string) =>
     apiClient.delete<void>(`/cats/${catId}/chips/${chipId}`),
+  scheduleChipType: (catId: string, chipTypeId: string) =>
+    apiClient.post<void>(`/cats/${catId}/calendar/scheduled-chip-types`, { chipTypeId }),
+  unscheduleChipType: (catId: string, chipTypeId: string) =>
+    apiClient.delete<void>(`/cats/${catId}/calendar/scheduled-chip-types/${chipTypeId}`),
 }

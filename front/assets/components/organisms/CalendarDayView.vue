@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { EnrichedChip } from '../../types'
+import type { ChipType, EnrichedChip } from '../../types'
 
 const props = defineProps<{
   day: Date
   chips: EnrichedChip[]
+  scheduledChipTypeIds: string[]
+  chipTypes: ChipType[]
 }>()
 
 const emit = defineEmits<{
   dayClick: [date: string]
   chipClick: [chip: EnrichedChip]
+  scheduledChipToggle: [payload: { date: string; chipTypeId: string; existingChipId: string | null }]
 }>()
 
 const today = toISO(new Date())
@@ -31,9 +34,33 @@ const dayChips = computed(() =>
     .sort((a, b) => a.date.localeCompare(b.date)),
 )
 
+/** Scheduled chip types with their "done" state for this day */
+const scheduledItems = computed(() =>
+  props.scheduledChipTypeIds.map((chipTypeId) => {
+    const chipType = props.chipTypes.find((ct) => ct.id === chipTypeId)
+    const placedChip = dayChips.value.find((c) => c.chipTypeId === chipTypeId) ?? null
+    return {
+      chipTypeId,
+      name: chipType?.name ?? 'Unknown',
+      color: chipType?.color ?? '#999',
+      done: placedChip !== null,
+      existingChipId: placedChip?.id ?? null,
+    }
+  }),
+)
+
 function chipTime(chip: EnrichedChip): string {
   const d = new Date(chip.date)
   return d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })
+}
+
+function onScheduledItemClick(item: { chipTypeId: string; existingChipId: string | null }, event: Event): void {
+  event.stopPropagation()
+  emit('scheduledChipToggle', {
+    date: isoDay.value,
+    chipTypeId: item.chipTypeId,
+    existingChipId: item.existingChipId,
+  })
 }
 </script>
 
@@ -62,7 +89,10 @@ function chipTime(chip: EnrichedChip): string {
         <div :class="['text-sm mt-0.5', isToday ? 'text-rose-200' : 'text-[var(--text-3)]']">
           {{ monthYear }}
         </div>
-        <div v-if="isToday" class="inline-flex items-center gap-1 text-xs text-white/80 font-semibold mt-1.5 bg-white/20 px-2.5 py-0.5 rounded-full">
+        <div
+          v-if="isToday"
+          class="inline-flex items-center gap-1 text-xs text-white/80 font-semibold mt-1.5 bg-white/20 px-2.5 py-0.5 rounded-full"
+        >
           <span class="w-1.5 h-1.5 rounded-full bg-white/80 animate-pulse" />
           Today
         </div>
@@ -85,6 +115,64 @@ function chipTime(chip: EnrichedChip): string {
       class="flex flex-col gap-2.5 min-h-72 bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-3 cursor-pointer hover:border-[var(--border-md)] hover:bg-[var(--surface-2)] transition-all group"
       @click="emit('dayClick', isoDay)"
     >
+      <!-- Scheduled chip type checkboxes -->
+      <template v-if="scheduledItems.length">
+        <button
+          v-for="item in scheduledItems"
+          :key="item.chipTypeId"
+          class="flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all hover:brightness-95 active:scale-[0.99]"
+          :style="item.done
+            ? { borderColor: item.color + '60', background: item.color + '18' }
+            : { borderColor: item.color + '40', background: 'transparent', borderStyle: 'dashed' }"
+          @click="onScheduledItemClick(item, $event)"
+        >
+          <!-- Checkbox icon -->
+          <span
+            class="flex-shrink-0 w-4 h-4 rounded flex items-center justify-center border-2 transition-colors"
+            :style="item.done
+              ? { background: item.color, borderColor: item.color }
+              : { background: 'transparent', borderColor: item.color }"
+          >
+            <svg
+              v-if="item.done"
+              class="w-2.5 h-2.5 text-white"
+              viewBox="0 0 12 12"
+              fill="none"
+            >
+              <path
+                d="M2 6l3 3 5-5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+
+          <span
+            class="flex-1 text-sm font-semibold truncate"
+            :style="{ color: item.color }"
+            :class="{ 'line-through opacity-60': item.done }"
+          >
+            {{ item.name }}
+          </span>
+
+          <span
+            v-if="item.done"
+            class="text-[10px] font-medium px-1.5 py-0.5 rounded-full"
+            :style="{ background: item.color + '20', color: item.color }"
+          >
+            done
+          </span>
+        </button>
+
+        <div
+          v-if="scheduledItems.length"
+          class="border-t border-[var(--border)]/50 my-0.5"
+        />
+      </template>
+
+      <!-- Placed chips (scheduled + done shown here, non-scheduled always shown) -->
       <template v-if="dayChips.length">
         <div
           v-for="chip in dayChips"
@@ -99,34 +187,68 @@ function chipTime(chip: EnrichedChip): string {
           />
 
           <div class="flex-1 min-w-0">
-            <div :style="{ color: chip.chipTypeColor }" class="font-semibold text-sm leading-tight truncate">
+            <div
+              :style="{ color: chip.chipTypeColor }"
+              class="font-semibold text-sm leading-tight truncate"
+            >
               {{ chip.chipTypeName }}
             </div>
             <div class="text-xs text-[var(--text-3)] mt-0.5 tabular-nums">
               {{ chipTime(chip) }}
             </div>
-            <div v-if="chip.note" class="text-xs text-[var(--text-2)] mt-1 line-clamp-2">
+            <div
+              v-if="chip.note"
+              class="text-xs text-[var(--text-2)] mt-1 line-clamp-2"
+            >
               {{ chip.note }}
             </div>
           </div>
 
-          <div v-if="chip.authorUsername" class="flex items-center gap-1 text-xs text-[var(--text-3)] flex-shrink-0">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 opacity-60">
+          <div
+            v-if="chip.authorUsername"
+            class="flex items-center gap-1 text-xs text-[var(--text-3)] flex-shrink-0"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-3 h-3 opacity-60"
+            >
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
+              <circle
+                cx="12"
+                cy="7"
+                r="4"
+              />
             </svg>
             <span class="opacity-70">{{ chip.authorUsername }}</span>
           </div>
 
           <!-- Chevron hint -->
-          <svg class="w-4 h-4 text-[var(--text-3)] opacity-40 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          <svg
+            class="w-4 h-4 text-[var(--text-3)] opacity-40 flex-shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </div>
       </template>
 
       <!-- Empty state -->
-      <div v-else class="flex flex-col items-center justify-center flex-1 text-center py-10 gap-3 pointer-events-none">
+      <div
+        v-if="!dayChips.length && !scheduledItems.length"
+        class="flex flex-col items-center justify-center flex-1 text-center py-10 gap-3 pointer-events-none"
+      >
         <div
           :class="[
             'w-14 h-14 rounded-full flex items-center justify-center',
@@ -140,18 +262,26 @@ function chipTime(chip: EnrichedChip): string {
             stroke="currentColor"
             stroke-width="1.5"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5m-9-6h.008v.008H12V9.75zm0 3.75h.008v.008H12V13.5zm0 3.75h.008v.008H12v-.008zm3.75-7.5h.008v.008H15.75V9.75zm0 3.75h.008v.008H15.75V13.5zm-7.5 0h.008v.008H8.25V13.5zm0 3.75h.008v.008H8.25v-.008z" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5m-9-6h.008v.008H12V9.75zm0 3.75h.008v.008H12V13.5zm0 3.75h.008v.008H12v-.008zm3.75-7.5h.008v.008H15.75V9.75zm0 3.75h.008v.008H15.75V13.5zm-7.5 0h.008v.008H8.25V13.5zm0 3.75h.008v.008H8.25v-.008z"
+            />
           </svg>
         </div>
         <div>
-          <p class="text-sm font-semibold text-[var(--text-2)]">Nothing scheduled</p>
-          <p class="text-xs text-[var(--text-3)] mt-0.5">Tap anywhere to add a chip</p>
+          <p class="text-sm font-semibold text-[var(--text-2)]">
+            Nothing scheduled
+          </p>
+          <p class="text-xs text-[var(--text-3)] mt-0.5">
+            Tap anywhere to add a chip
+          </p>
         </div>
       </div>
 
       <!-- Add hint when chips exist -->
       <div
-        v-if="dayChips.length"
+        v-if="dayChips.length || scheduledItems.length"
         class="mt-auto text-center text-xs text-[var(--text-3)] opacity-0 group-hover:opacity-100 transition-opacity pt-1"
       >
         + add chip

@@ -50,6 +50,7 @@ final readonly class GetCalendarHandler
             id: $calendar->id()->value(),
             catId: $calendar->catId(),
             chips: $chipViews,
+            scheduledChipTypeIds: $calendar->scheduledChipTypeIds(),
         );
     }
 }

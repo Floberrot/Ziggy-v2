@@ -102,4 +102,71 @@ final class CalendarTest extends TestCase
         $secondPull = $calendar->pullDomainEvents();
         self::assertEmpty($secondPull);
     }
+
+    public function testNewCalendarHasNoScheduledChipTypes(): void
+    {
+        $calendar = Calendar::create(CalendarId::generate(), 'cat-123');
+
+        self::assertEmpty($calendar->scheduledChipTypeIds());
+    }
+
+    public function testScheduleChipTypeAddsToList(): void
+    {
+        $calendar = Calendar::create(CalendarId::generate(), 'cat-123');
+
+        $calendar->scheduleChipType('type-abc');
+
+        self::assertSame(['type-abc'], $calendar->scheduledChipTypeIds());
+    }
+
+    public function testScheduleChipTypeIsIdempotent(): void
+    {
+        $calendar = Calendar::create(CalendarId::generate(), 'cat-123');
+
+        $calendar->scheduleChipType('type-abc');
+        $calendar->scheduleChipType('type-abc');
+
+        self::assertCount(1, $calendar->scheduledChipTypeIds());
+    }
+
+    public function testScheduleMultipleChipTypes(): void
+    {
+        $calendar = Calendar::create(CalendarId::generate(), 'cat-123');
+
+        $calendar->scheduleChipType('type-1');
+        $calendar->scheduleChipType('type-2');
+
+        self::assertSame(['type-1', 'type-2'], $calendar->scheduledChipTypeIds());
+    }
+
+    public function testUnscheduleChipTypeRemovesFromList(): void
+    {
+        $calendar = Calendar::create(CalendarId::generate(), 'cat-123');
+
+        $calendar->scheduleChipType('type-1');
+        $calendar->scheduleChipType('type-2');
+        $calendar->unscheduleChipType('type-1');
+
+        self::assertSame(['type-2'], $calendar->scheduledChipTypeIds());
+    }
+
+    public function testUnscheduleNonExistentChipTypeDoesNothing(): void
+    {
+        $calendar = Calendar::create(CalendarId::generate(), 'cat-123');
+        $calendar->scheduleChipType('type-1');
+
+        $calendar->unscheduleChipType('type-not-scheduled');
+
+        self::assertSame(['type-1'], $calendar->scheduledChipTypeIds());
+    }
+
+    public function testSetScheduledChipTypeIdsOverwritesList(): void
+    {
+        $calendar = Calendar::create(CalendarId::generate(), 'cat-123');
+        $calendar->scheduleChipType('type-old');
+
+        $calendar->setScheduledChipTypeIds(['type-a', 'type-b']);
+
+        self::assertSame(['type-a', 'type-b'], $calendar->scheduledChipTypeIds());
+    }
 }

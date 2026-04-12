@@ -71,7 +71,10 @@ function handleSubmit(): void {
     />
 
     <template #footer>
-      <RouterLink to="/login" class="text-rose-400 font-semibold hover:text-rose-300 hover:underline">
+      <RouterLink
+        to="/login"
+        class="text-rose-400 font-semibold hover:text-rose-300 hover:underline"
+      >
         Back to sign in
       </RouterLink>
     </template>

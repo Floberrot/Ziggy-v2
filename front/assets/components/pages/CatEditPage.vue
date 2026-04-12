@@ -93,25 +93,67 @@ function handleSubmit(): void {
   <MainTemplate>
     <div class="max-w-2xl mx-auto px-6 py-10">
       <div class="flex items-center gap-4 mb-8">
-        <BaseButton variant="ghost" @click="$router.push('/cats')">← Back</BaseButton>
+        <BaseButton
+          variant="ghost"
+          @click="$router.push('/cats')"
+        >
+          ← Back
+        </BaseButton>
         <div>
-          <h1 class="text-2xl font-bold text-[var(--text)]">Edit cat</h1>
-          <p v-if="cat" class="text-[var(--text-2)] text-sm mt-0.5">{{ cat.name }}</p>
+          <h1 class="text-2xl font-bold text-[var(--text)]">
+            Edit cat
+          </h1>
+          <p
+            v-if="cat"
+            class="text-[var(--text-2)] text-sm mt-0.5"
+          >
+            {{ cat.name }}
+          </p>
         </div>
       </div>
 
-      <div v-if="isPending" class="text-center py-16 text-[var(--text-3)]">Loading…</div>
-      <div v-else-if="isError" class="text-center py-16 text-red-400">Failed to load cat.</div>
+      <div
+        v-if="isPending"
+        class="text-center py-16 text-[var(--text-3)]"
+      >
+        Loading…
+      </div>
+      <div
+        v-else-if="isError"
+        class="text-center py-16 text-red-400"
+      >
+        Failed to load cat.
+      </div>
 
-      <div v-else class="flex flex-col gap-8">
+      <div
+        v-else
+        class="flex flex-col gap-8"
+      >
         <div class="bg-[var(--surface)] rounded-2xl border border-[var(--border)] p-6">
-          <h2 class="text-base font-semibold text-[var(--text)] mb-5">Details</h2>
-          <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
-            <div v-if="formError" class="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400">
+          <h2 class="text-base font-semibold text-[var(--text)] mb-5">
+            Details
+          </h2>
+          <form
+            class="flex flex-col gap-4"
+            @submit.prevent="handleSubmit"
+          >
+            <div
+              v-if="formError"
+              class="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400"
+            >
               {{ formError }}
             </div>
-            <BaseInput v-model="form.name" label="Name *" placeholder="e.g. Mochi" />
-            <BaseInput :model-value="form.breed ?? undefined" label="Breed" placeholder="e.g. Maine Coon" @update:model-value="form.breed = $event || null" />
+            <BaseInput
+              v-model="form.name"
+              label="Name *"
+              placeholder="e.g. Mochi"
+            />
+            <BaseInput
+              :model-value="form.breed ?? undefined"
+              label="Breed"
+              placeholder="e.g. Maine Coon"
+              @update:model-value="form.breed = $event || null"
+            />
             <BaseInput
               :model-value="form.weight !== null ? String(form.weight) : ''"
               type="number"
@@ -119,10 +161,25 @@ function handleSubmit(): void {
               placeholder="e.g. 4.5"
               @update:model-value="form.weight = $event ? parseFloat($event) : null"
             />
-            <BaseColorPicker v-model="form.color" label="Color" :presets="CAT_COLOR_PRESETS" />
+            <BaseColorPicker
+              v-model="form.color"
+              label="Color"
+              :presets="CAT_COLOR_PRESETS"
+            />
             <div class="flex justify-end gap-3 pt-2">
-              <BaseButton variant="secondary" @click="$router.push('/cats')">Cancel</BaseButton>
-              <BaseButton type="submit" variant="primary" :loading="updating">Save changes</BaseButton>
+              <BaseButton
+                variant="secondary"
+                @click="$router.push('/cats')"
+              >
+                Cancel
+              </BaseButton>
+              <BaseButton
+                type="submit"
+                variant="primary"
+                :loading="updating"
+              >
+                Save changes
+              </BaseButton>
             </div>
           </form>
         </div>

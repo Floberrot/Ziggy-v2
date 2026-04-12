@@ -34,19 +34,30 @@ async function handleLogin(): Promise<void> {
       <div class="mb-6 flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-amber-400">
         <span class="text-xl">⚠️</span>
         <div>
-          <p class="font-semibold text-sm">Restricted Area — Admin Access</p>
-          <p class="text-xs text-amber-400/70 mt-0.5">This panel is for administrators only. All actions are logged.</p>
+          <p class="font-semibold text-sm">
+            Restricted Area — Admin Access
+          </p>
+          <p class="text-xs text-amber-400/70 mt-0.5">
+            This panel is for administrators only. All actions are logged.
+          </p>
         </div>
       </div>
 
       <div class="rounded-2xl border border-zinc-700 bg-zinc-900 p-8 shadow-2xl">
         <div class="mb-6 text-center">
           <span class="text-4xl">🛡️</span>
-          <h1 class="mt-2 text-xl font-bold text-zinc-100">Admin Login</h1>
-          <p class="text-sm text-zinc-400 mt-1">Ziggy Administration Panel</p>
+          <h1 class="mt-2 text-xl font-bold text-zinc-100">
+            Admin Login
+          </h1>
+          <p class="text-sm text-zinc-400 mt-1">
+            Ziggy Administration Panel
+          </p>
         </div>
 
-        <form class="space-y-4" @submit.prevent="handleLogin">
+        <form
+          class="space-y-4"
+          @submit.prevent="handleLogin"
+        >
           <div>
             <label class="block text-xs font-medium text-zinc-400 mb-1">Email</label>
             <input
@@ -55,7 +66,7 @@ async function handleLogin(): Promise<void> {
               required
               placeholder="admin@example.com"
               class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
-            />
+            >
           </div>
 
           <div>
@@ -66,7 +77,7 @@ async function handleLogin(): Promise<void> {
               required
               placeholder="••••••••"
               class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
-            />
+            >
           </div>
 
           <div>
@@ -80,7 +91,7 @@ async function handleLogin(): Promise<void> {
               required
               placeholder="••••••••••••"
               class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
-            />
+            >
           </div>
 
           <div

@@ -23,8 +23,20 @@ defineEmits<{
       <span class="text-xs font-mono text-[var(--text-3)] uppercase">{{ chipType.color }}</span>
     </div>
     <div class="flex gap-2">
-      <BaseButton variant="secondary" size="sm" @click="$emit('edit', chipType)">Edit</BaseButton>
-      <BaseButton variant="danger" size="sm" @click="$emit('delete', chipType)">Delete</BaseButton>
+      <BaseButton
+        variant="secondary"
+        size="sm"
+        @click="$emit('edit', chipType)"
+      >
+        Edit
+      </BaseButton>
+      <BaseButton
+        variant="danger"
+        size="sm"
+        @click="$emit('delete', chipType)"
+      >
+        Delete
+      </BaseButton>
     </div>
   </div>
 </template>

@@ -91,7 +91,10 @@ function handleSubmit(): void {
 
     <template #footer>
       Already have an account?
-      <RouterLink to="/login" class="text-rose-400 font-semibold hover:text-rose-300 hover:underline">
+      <RouterLink
+        to="/login"
+        class="text-rose-400 font-semibold hover:text-rose-300 hover:underline"
+      >
         Sign in
       </RouterLink>
     </template>

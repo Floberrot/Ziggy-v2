@@ -104,18 +104,43 @@ function handleDelete(cat: Cat): void {
     <div class="max-w-4xl mx-auto px-6 py-10">
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-[var(--text)]">My Cats 🐱</h1>
-          <p class="text-[var(--text-2)] mt-1">Manage your cats and their calendars.</p>
+          <h1 class="text-3xl font-bold text-[var(--text)]">
+            My Cats 🐱
+          </h1>
+          <p class="text-[var(--text-2)] mt-1">
+            Manage your cats and their calendars.
+          </p>
         </div>
-        <BaseButton variant="primary" @click="openCreate">+ Add cat</BaseButton>
+        <BaseButton
+          variant="primary"
+          @click="openCreate"
+        >
+          + Add cat
+        </BaseButton>
       </div>
 
-      <div v-if="isPending" class="text-center py-16 text-[var(--text-3)]">Loading…</div>
-      <div v-else-if="isError" class="text-center py-16 text-red-400">Failed to load cats.</div>
-      <div v-else-if="!cats?.length" class="text-center py-16 text-[var(--text-3)]">
+      <div
+        v-if="isPending"
+        class="text-center py-16 text-[var(--text-3)]"
+      >
+        Loading…
+      </div>
+      <div
+        v-else-if="isError"
+        class="text-center py-16 text-red-400"
+      >
+        Failed to load cats.
+      </div>
+      <div
+        v-else-if="!cats?.length"
+        class="text-center py-16 text-[var(--text-3)]"
+      >
         No cats yet. Add your first cat!
       </div>
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div
+        v-else
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+      >
         <CatCard
           v-for="cat in cats"
           :key="cat.id"
@@ -130,12 +155,27 @@ function handleDelete(cat: Cat): void {
       title="Add a cat"
       @close="closeModal"
     >
-      <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
-        <div v-if="formError" class="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400">
+      <form
+        class="flex flex-col gap-4"
+        @submit.prevent="handleSubmit"
+      >
+        <div
+          v-if="formError"
+          class="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400"
+        >
           {{ formError }}
         </div>
-        <BaseInput v-model="form.name" label="Name *" placeholder="e.g. Mochi" />
-        <BaseInput :model-value="form.breed ?? undefined" label="Breed" placeholder="e.g. Maine Coon" @update:model-value="form.breed = $event || null" />
+        <BaseInput
+          v-model="form.name"
+          label="Name *"
+          placeholder="e.g. Mochi"
+        />
+        <BaseInput
+          :model-value="form.breed ?? undefined"
+          label="Breed"
+          placeholder="e.g. Maine Coon"
+          @update:model-value="form.breed = $event || null"
+        />
         <BaseInput
           :model-value="form.weight !== null ? String(form.weight) : ''"
           type="number"
@@ -143,10 +183,26 @@ function handleDelete(cat: Cat): void {
           placeholder="e.g. 4.5"
           @update:model-value="form.weight = $event ? parseFloat($event) : null"
         />
-        <BaseColorPicker v-model="form.color" label="Color" :presets="CAT_COLOR_PRESETS" />
+        <BaseColorPicker
+          v-model="form.color"
+          label="Color"
+          :presets="CAT_COLOR_PRESETS"
+        />
         <div class="flex justify-end gap-3 pt-2">
-          <BaseButton type="button" variant="secondary" @click="closeModal">Cancel</BaseButton>
-          <BaseButton type="submit" variant="primary" :loading="creating">Add cat</BaseButton>
+          <BaseButton
+            type="button"
+            variant="secondary"
+            @click="closeModal"
+          >
+            Cancel
+          </BaseButton>
+          <BaseButton
+            type="submit"
+            variant="primary"
+            :loading="creating"
+          >
+            Add cat
+          </BaseButton>
         </div>
       </form>
     </BaseModal>
