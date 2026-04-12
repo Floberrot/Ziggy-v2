@@ -174,18 +174,43 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
     <div class="max-w-3xl mx-auto px-6 py-10">
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-[var(--text)]">Pet Sitters ✉️</h1>
-          <p class="text-[var(--text-2)] mt-1">Manage helpers who can access your cats' calendars.</p>
+          <h1 class="text-3xl font-bold text-[var(--text)]">
+            Pet Sitters ✉️
+          </h1>
+          <p class="text-[var(--text-2)] mt-1">
+            Manage helpers who can access your cats' calendars.
+          </p>
         </div>
-        <BaseButton variant="primary" @click="openCreate">+ Add pet sitter</BaseButton>
+        <BaseButton
+          variant="primary"
+          @click="openCreate"
+        >
+          + Add pet sitter
+        </BaseButton>
       </div>
 
-      <div v-if="isPending" class="text-center py-16 text-[var(--text-3)]">Loading…</div>
-      <div v-else-if="isError" class="text-center py-16 text-red-400">Failed to load pet sitters.</div>
-      <div v-else-if="!petSitters?.length" class="text-center py-16 text-[var(--text-3)]">
+      <div
+        v-if="isPending"
+        class="text-center py-16 text-[var(--text-3)]"
+      >
+        Loading…
+      </div>
+      <div
+        v-else-if="isError"
+        class="text-center py-16 text-red-400"
+      >
+        Failed to load pet sitters.
+      </div>
+      <div
+        v-else-if="!petSitters?.length"
+        class="text-center py-16 text-[var(--text-3)]"
+      >
         No pet sitters yet. Add one!
       </div>
-      <div v-else class="flex flex-col gap-3">
+      <div
+        v-else
+        class="flex flex-col gap-3"
+      >
         <PetSitterRow
           v-for="ps in petSitters"
           :key="ps.id"
@@ -214,10 +239,22 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
             v-model="editForm.type"
             class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-md)] text-sm bg-[var(--surface-3)] text-[var(--text)] focus:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 outline-none"
           >
-            <option v-for="t in petSitterTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
+            <option
+              v-for="t in petSitterTypes"
+              :key="t.value"
+              :value="t.value"
+            >
+              {{ t.label }}
+            </option>
           </select>
         </div>
-        <BaseInput :model-value="editForm.age !== null ? String(editForm.age) : ''" type="number" label="Age" placeholder="Optional" @update:model-value="editForm.age = $event ? Number($event) : null" />
+        <BaseInput
+          :model-value="editForm.age !== null ? String(editForm.age) : ''"
+          type="number"
+          label="Age"
+          placeholder="Optional"
+          @update:model-value="editForm.age = $event ? Number($event) : null"
+        />
         <BaseInput
           :model-value="editForm.phoneNumber ?? undefined"
           type="tel"
@@ -226,8 +263,20 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
           @update:model-value="editForm.phoneNumber = $event ? $event.replace(/[^\d\s+\-().]/g, '') : null"
         />
         <div class="flex justify-end gap-3 pt-2">
-          <BaseButton type="button" variant="secondary" @click="closeModal">Cancel</BaseButton>
-          <BaseButton type="submit" variant="primary" :loading="updating">Save changes</BaseButton>
+          <BaseButton
+            type="button"
+            variant="secondary"
+            @click="closeModal"
+          >
+            Cancel
+          </BaseButton>
+          <BaseButton
+            type="submit"
+            variant="primary"
+            :loading="updating"
+          >
+            Save changes
+          </BaseButton>
         </div>
       </form>
 
@@ -236,18 +285,38 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
         class="flex flex-col gap-4"
         @submit.prevent="handleCreate"
       >
-        <div v-if="createError" class="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400">
+        <div
+          v-if="createError"
+          class="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400"
+        >
           {{ createError }}
         </div>
-        <BaseInput v-model="createForm.inviteeEmail" type="email" label="Pet sitter email *" placeholder="petsitter@example.com" />
+        <BaseInput
+          v-model="createForm.inviteeEmail"
+          type="email"
+          label="Pet sitter email *"
+          placeholder="petsitter@example.com"
+        />
         <div class="flex flex-col gap-1.5">
           <label class="text-sm font-medium text-[var(--text-2)]">Cat *</label>
           <select
             v-model="createForm.catId"
             class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-md)] text-sm bg-[var(--surface-3)] text-[var(--text)] focus:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 outline-none"
           >
-            <option v-if="!cats?.length" value="" disabled>No cats yet</option>
-            <option v-for="cat in cats" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+            <option
+              v-if="!cats?.length"
+              value=""
+              disabled
+            >
+              No cats yet
+            </option>
+            <option
+              v-for="cat in cats"
+              :key="cat.id"
+              :value="cat.id"
+            >
+              {{ cat.name }}
+            </option>
           </select>
         </div>
         <div class="flex flex-col gap-1.5">
@@ -256,10 +325,22 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
             v-model="createForm.type"
             class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-md)] text-sm bg-[var(--surface-3)] text-[var(--text)] focus:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 outline-none"
           >
-            <option v-for="t in petSitterTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
+            <option
+              v-for="t in petSitterTypes"
+              :key="t.value"
+              :value="t.value"
+            >
+              {{ t.label }}
+            </option>
           </select>
         </div>
-        <BaseInput :model-value="createForm.age !== null ? String(createForm.age) : ''" type="number" label="Age" placeholder="Optional" @update:model-value="createForm.age = $event ? Number($event) : null" />
+        <BaseInput
+          :model-value="createForm.age !== null ? String(createForm.age) : ''"
+          type="number"
+          label="Age"
+          placeholder="Optional"
+          @update:model-value="createForm.age = $event ? Number($event) : null"
+        />
         <BaseInput
           :model-value="createForm.phoneNumber ?? undefined"
           type="tel"
@@ -268,8 +349,20 @@ const petSitterTypes: { value: PetSitterType; label: string }[] = [
           @update:model-value="createForm.phoneNumber = $event ? $event.replace(/[^\d\s+\-().]/g, '') : null"
         />
         <div class="flex justify-end gap-3 pt-2">
-          <BaseButton type="button" variant="secondary" @click="closeModal">Cancel</BaseButton>
-          <BaseButton type="submit" variant="primary" :loading="creating">Add pet sitter</BaseButton>
+          <BaseButton
+            type="button"
+            variant="secondary"
+            @click="closeModal"
+          >
+            Cancel
+          </BaseButton>
+          <BaseButton
+            type="submit"
+            variant="primary"
+            :loading="creating"
+          >
+            Add pet sitter
+          </BaseButton>
         </div>
       </form>
     </BaseModal>

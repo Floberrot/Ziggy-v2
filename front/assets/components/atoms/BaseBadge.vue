@@ -4,6 +4,7 @@ withDefaults(defineProps<{
   color?: string
 }>(), {
   variant: 'default',
+  color: undefined,
 })
 </script>
 

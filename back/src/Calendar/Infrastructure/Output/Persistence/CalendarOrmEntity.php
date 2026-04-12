@@ -22,6 +22,10 @@ class CalendarOrmEntity
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
+    /** @var list<string> */
+    #[ORM\Column(type: 'json')]
+    private array $scheduledChipTypeIds = [];
+
     /** @var Collection<int, ChipOrmEntity> */
     #[ORM\OneToMany(
         targetEntity: ChipOrmEntity::class,
@@ -78,5 +82,17 @@ class CalendarOrmEntity
             $this->chips->add($chip);
             $chip->setCalendar($this);
         }
+    }
+
+    /** @return list<string> */
+    public function getScheduledChipTypeIds(): array
+    {
+        return $this->scheduledChipTypeIds;
+    }
+
+    /** @param list<string> $ids */
+    public function setScheduledChipTypeIds(array $ids): void
+    {
+        $this->scheduledChipTypeIds = $ids;
     }
 }

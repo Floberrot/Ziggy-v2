@@ -72,6 +72,7 @@ export interface Calendar {
   id: string
   catId: string
   chips: Chip[]
+  scheduledChipTypeIds: string[]
 }
 
 export interface User {

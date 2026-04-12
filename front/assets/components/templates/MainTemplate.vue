@@ -9,7 +9,10 @@ const currentYear = computed(() => new Date().getFullYear())
   <div class="flex flex-col min-h-screen bg-[var(--bg)] font-sans text-[var(--text)]">
     <!-- Header -->
     <header class="sticky top-0 z-40 flex items-center justify-between px-6 py-3.5 bg-[var(--surface)]/80 backdrop-blur-xl border-b border-[var(--border)]">
-      <RouterLink to="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+      <RouterLink
+        to="/"
+        class="flex items-center gap-2 hover:opacity-80 transition-opacity"
+      >
         <span class="text-2xl">🐱</span>
         <span class="text-lg font-bold tracking-tight text-rose-400">Ziggy</span>
       </RouterLink>

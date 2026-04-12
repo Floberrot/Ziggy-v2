@@ -87,33 +87,47 @@ function logout(): void {
           to="/admin"
           class="rounded-lg px-3 py-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition"
           active-class="bg-zinc-800 text-zinc-100"
-        >Logs</RouterLink>
+        >
+          Logs
+        </RouterLink>
         <RouterLink
           to="/admin/users"
           class="rounded-lg px-3 py-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition"
           active-class="bg-zinc-800 text-zinc-100"
-        >Users</RouterLink>
+        >
+          Users
+        </RouterLink>
         <RouterLink
           to="/admin/cats"
           class="rounded-lg px-3 py-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition"
           active-class="bg-zinc-800 text-zinc-100"
-        >Cats</RouterLink>
+        >
+          Cats
+        </RouterLink>
         <RouterLink
           to="/admin/pet-sitters"
           class="rounded-lg px-3 py-1.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition"
           active-class="bg-zinc-800 text-zinc-100"
-        >Pet Sitters</RouterLink>
+        >
+          Pet Sitters
+        </RouterLink>
         <button
           class="ml-3 rounded-lg px-3 py-1.5 text-xs text-red-400 border border-red-500/30 hover:bg-red-500/10 transition"
           @click="logout"
-        >Sign out</button>
+        >
+          Sign out
+        </button>
       </nav>
     </header>
 
     <div class="mx-auto max-w-7xl px-6 py-8">
       <div class="mb-6">
-        <h1 class="text-2xl font-bold text-zinc-100">Error Logs</h1>
-        <p class="text-sm text-zinc-400 mt-1">HTTP 4xx and 5xx errors captured from the API</p>
+        <h1 class="text-2xl font-bold text-zinc-100">
+          Error Logs
+        </h1>
+        <p class="text-sm text-zinc-400 mt-1">
+          HTTP 4xx and 5xx errors captured from the API
+        </p>
       </div>
 
       <!-- Filters -->
@@ -125,7 +139,7 @@ function logout(): void {
             type="text"
             placeholder="/api/cats or 'not found'"
             class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:outline-none"
-          />
+          >
         </div>
         <div class="w-48">
           <label class="block text-xs text-zinc-400 mb-1">User ID / Email</label>
@@ -134,7 +148,7 @@ function logout(): void {
             type="text"
             placeholder="user@example.com"
             class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-amber-500 focus:outline-none"
-          />
+          >
         </div>
         <div class="w-40">
           <label class="block text-xs text-zinc-400 mb-1">Log Level</label>
@@ -142,21 +156,33 @@ function logout(): void {
             v-model="logLevelInput"
             class="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 focus:border-amber-500 focus:outline-none"
           >
-            <option value="">All levels</option>
-            <option value="error">Error (5xx)</option>
-            <option value="warning">Warning (4xx)</option>
-            <option value="info">Info</option>
+            <option value="">
+              All levels
+            </option>
+            <option value="error">
+              Error (5xx)
+            </option>
+            <option value="warning">
+              Warning (4xx)
+            </option>
+            <option value="info">
+              Info
+            </option>
           </select>
         </div>
         <div class="flex gap-2">
           <button
             class="rounded-lg bg-amber-500 px-4 py-1.5 text-sm font-medium text-zinc-950 hover:bg-amber-400 transition"
             @click="applyFilters"
-          >Apply</button>
+          >
+            Apply
+          </button>
           <button
             class="rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-400 hover:bg-zinc-800 transition"
             @click="clearFilters"
-          >Clear</button>
+          >
+            Clear
+          </button>
         </div>
       </div>
 
@@ -167,11 +193,22 @@ function logout(): void {
       </div>
 
       <!-- Table -->
-      <div v-if="isPending" class="text-center py-12 text-zinc-500">Loading logs…</div>
-      <div v-else-if="!logs?.items.length" class="rounded-xl border border-zinc-700 bg-zinc-900 py-12 text-center text-zinc-500">
+      <div
+        v-if="isPending"
+        class="text-center py-12 text-zinc-500"
+      >
+        Loading logs…
+      </div>
+      <div
+        v-else-if="!logs?.items.length"
+        class="rounded-xl border border-zinc-700 bg-zinc-900 py-12 text-center text-zinc-500"
+      >
         No logs found.
       </div>
-      <div v-else class="space-y-2">
+      <div
+        v-else
+        class="space-y-2"
+      >
         <div
           v-for="log in logs.items"
           :key="log.id"
@@ -192,37 +229,57 @@ function logout(): void {
             <span class="shrink-0 text-xs text-zinc-600 ml-2">{{ new Date(log.createdAt).toLocaleString() }}</span>
             <span class="shrink-0 text-xs text-zinc-600">{{ expandedLogId === log.id ? '▲' : '▼' }}</span>
           </div>
-          <div v-if="expandedLogId === log.id" class="border-t border-zinc-700 px-4 py-3 bg-zinc-950/50">
+          <div
+            v-if="expandedLogId === log.id"
+            class="border-t border-zinc-700 px-4 py-3 bg-zinc-950/50"
+          >
             <div class="grid grid-cols-2 gap-2 text-xs text-zinc-400 mb-3">
               <div><span class="text-zinc-600">User:</span> {{ log.userId ?? '—' }}</div>
-              <div><span class="text-zinc-600">Log Level:</span>
+              <div>
+                <span class="text-zinc-600">Log Level:</span>
                 <span :class="log.logLevel === 'error' ? 'text-red-400' : 'text-amber-400'">
                   {{ log.logLevel }}
                 </span>
               </div>
-              <div class="col-span-2"><span class="text-zinc-600">Message:</span> {{ log.message }}</div>
+              <div class="col-span-2">
+                <span class="text-zinc-600">Message:</span> {{ log.message }}
+              </div>
             </div>
             <div v-if="log.stackTrace">
-              <p class="text-xs text-zinc-600 mb-1">Stack trace:</p>
+              <p class="text-xs text-zinc-600 mb-1">
+                Stack trace:
+              </p>
               <pre class="text-xs text-red-300/80 bg-zinc-950 rounded p-3 overflow-auto max-h-64 whitespace-pre-wrap">{{ log.stackTrace }}</pre>
             </div>
-            <div v-else class="text-xs text-zinc-600 italic">No stack trace available.</div>
+            <div
+              v-else
+              class="text-xs text-zinc-600 italic"
+            >
+              No stack trace available.
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Pagination -->
-      <div v-if="logs && logs.totalPages > 1" class="mt-4 flex justify-center gap-3">
+      <div
+        v-if="logs && logs.totalPages > 1"
+        class="mt-4 flex justify-center gap-3"
+      >
         <button
           :disabled="logs.page <= 1"
           class="rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-400 hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
           @click="prevPage"
-        >← Previous</button>
+        >
+          ← Previous
+        </button>
         <button
           :disabled="logs.page >= logs.totalPages"
           class="rounded-lg border border-zinc-700 px-4 py-1.5 text-sm text-zinc-400 hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
           @click="nextPage"
-        >Next →</button>
+        >
+          Next →
+        </button>
       </div>
     </div>
   </div>

@@ -7,6 +7,8 @@ const props = withDefaults(defineProps<{
   id?: string
   presets?: string[]
 }>(), {
+  label: undefined,
+  id: undefined,
   presets: () => [],
 })
 
@@ -19,12 +21,19 @@ const inputId = computed(() => props.id ?? `color-${Math.random().toString(36).s
 
 <template>
   <div class="flex flex-col gap-1.5">
-    <label v-if="label" :for="inputId" class="text-sm font-medium text-[var(--text-2)]">
+    <label
+      v-if="label"
+      :for="inputId"
+      class="text-sm font-medium text-[var(--text-2)]"
+    >
       {{ label }}
     </label>
 
     <!-- Preset swatches -->
-    <div v-if="presets.length" class="flex flex-wrap gap-2">
+    <div
+      v-if="presets.length"
+      class="flex flex-wrap gap-2"
+    >
       <button
         v-for="preset in presets"
         :key="preset"
@@ -49,7 +58,7 @@ const inputId = computed(() => props.id ?? `color-${Math.random().toString(36).s
         :value="modelValue"
         class="w-10 h-10 rounded-xl border-2 border-[var(--border-md)] cursor-pointer p-0.5 bg-[var(--surface-3)]"
         @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-      />
+      >
       <span class="text-sm font-mono text-[var(--text-2)] uppercase">{{ modelValue }}</span>
     </div>
   </div>

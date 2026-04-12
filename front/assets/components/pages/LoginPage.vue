@@ -76,12 +76,18 @@ function handleSubmit(): void {
     />
 
     <template #footer>
-      <RouterLink to="/forgot-password" class="text-rose-400 hover:text-rose-300 hover:underline">
+      <RouterLink
+        to="/forgot-password"
+        class="text-rose-400 hover:text-rose-300 hover:underline"
+      >
         Forgot your password?
       </RouterLink>
       <span class="mx-2 text-[var(--text-3)]">·</span>
       No account yet?
-      <RouterLink to="/register" class="text-rose-400 font-semibold hover:text-rose-300 hover:underline">
+      <RouterLink
+        to="/register"
+        class="text-rose-400 font-semibold hover:text-rose-300 hover:underline"
+      >
         Create one
       </RouterLink>
     </template>

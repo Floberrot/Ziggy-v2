@@ -52,6 +52,7 @@ final class GetCalendarControllerTest extends AuthenticatedWebTestCase
 
         self::assertArrayHasKey('chips', $data);
         self::assertCount(1, $data['chips']);
+        self::assertArrayHasKey('scheduledChipTypeIds', $data);
     }
 
     public function testGetCalendarReturns404WhenNoChipPlaced(): void

@@ -29,6 +29,8 @@ final readonly class DoctrineCalendarRepository implements CalendarRepository
             $entity->setCreatedAt($calendar->createdAt());
         }
 
+        $entity->setScheduledChipTypeIds($calendar->scheduledChipTypeIds());
+
         // Sync chips — add only new ones (chips are append-only for now)
         $existingIds = [];
         foreach ($entity->getChips() as $chipEntity) {
@@ -103,6 +105,7 @@ final readonly class DoctrineCalendarRepository implements CalendarRepository
         );
 
         $calendar->setChips(array_values($chips));
+        $calendar->setScheduledChipTypeIds($entity->getScheduledChipTypeIds());
 
         return $calendar;
     }

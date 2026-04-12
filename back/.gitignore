@@ -25,3 +25,7 @@ public/build/
 /phpunit.xml
 /.phpunit.cache/
 ###< phpunit/phpunit ###
+
+###> qossmic/deptrac ###
+/.deptrac.cache
+###< qossmic/deptrac ###

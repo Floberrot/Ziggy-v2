@@ -37,22 +37,54 @@ function invitationStatus(inv: PetSitterInvitationItem): { label: string; varian
   <div class="bg-[var(--surface)] rounded-xl border border-[var(--border)] hover:border-[var(--border-md)] transition-all p-4 flex flex-col gap-3">
     <div class="flex items-start justify-between gap-3 flex-wrap">
       <div class="flex-1 min-w-0">
-        <p class="font-medium text-[var(--text)] truncate">{{ petSitter.inviteeEmail }}</p>
+        <p class="font-medium text-[var(--text)] truncate">
+          {{ petSitter.inviteeEmail }}
+        </p>
         <div class="flex items-center gap-2 mt-1 flex-wrap">
-          <BaseBadge :variant="typeVariant(petSitter.type)">{{ typeLabel(petSitter.type) }}</BaseBadge>
-          <span v-if="petSitter.age" class="text-xs text-[var(--text-3)]">Age {{ petSitter.age }}</span>
-          <span v-if="petSitter.phoneNumber" class="text-xs text-[var(--text-3)]">{{ petSitter.phoneNumber }}</span>
-          <BaseBadge v-if="petSitter.userId" variant="success">Registered</BaseBadge>
+          <BaseBadge :variant="typeVariant(petSitter.type)">
+            {{ typeLabel(petSitter.type) }}
+          </BaseBadge>
+          <span
+            v-if="petSitter.age"
+            class="text-xs text-[var(--text-3)]"
+          >Age {{ petSitter.age }}</span>
+          <span
+            v-if="petSitter.phoneNumber"
+            class="text-xs text-[var(--text-3)]"
+          >{{ petSitter.phoneNumber }}</span>
+          <BaseBadge
+            v-if="petSitter.userId"
+            variant="success"
+          >
+            Registered
+          </BaseBadge>
         </div>
       </div>
       <div class="flex items-center gap-2 flex-shrink-0">
-        <BaseButton variant="ghost" size="sm" @click="$emit('edit', petSitter)">Edit</BaseButton>
-        <BaseButton variant="danger" size="sm" @click="$emit('remove', petSitter)">Remove</BaseButton>
+        <BaseButton
+          variant="ghost"
+          size="sm"
+          @click="$emit('edit', petSitter)"
+        >
+          Edit
+        </BaseButton>
+        <BaseButton
+          variant="danger"
+          size="sm"
+          @click="$emit('remove', petSitter)"
+        >
+          Remove
+        </BaseButton>
       </div>
     </div>
 
-    <div v-if="petSitter.invitations.length" class="flex flex-col gap-1.5 border-t border-[var(--border)] pt-3">
-      <p class="text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">Invitations</p>
+    <div
+      v-if="petSitter.invitations.length"
+      class="flex flex-col gap-1.5 border-t border-[var(--border)] pt-3"
+    >
+      <p class="text-xs font-medium text-[var(--text-3)] uppercase tracking-wide">
+        Invitations
+      </p>
       <div
         v-for="inv in petSitter.invitations"
         :key="inv.id"
@@ -60,7 +92,9 @@ function invitationStatus(inv: PetSitterInvitationItem): { label: string; varian
       >
         <span class="text-[var(--text-2)] truncate">{{ catNameMap[inv.catId] ?? inv.catId }}</span>
         <div class="flex items-center gap-1.5">
-          <BaseBadge :variant="invitationStatus(inv).variant">{{ invitationStatus(inv).label }}</BaseBadge>
+          <BaseBadge :variant="invitationStatus(inv).variant">
+            {{ invitationStatus(inv).label }}
+          </BaseBadge>
           <BaseButton
             v-if="!inv.accepted && !inv.declined"
             variant="ghost"

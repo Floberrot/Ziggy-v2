@@ -24,12 +24,22 @@ defineEmits<{
     <div class="relative w-full max-w-md">
       <!-- Logo -->
       <div class="text-center mb-8">
-        <RouterLink to="/" class="inline-flex items-center justify-center gap-2 mb-5 hover:opacity-80 transition-opacity">
+        <RouterLink
+          to="/"
+          class="inline-flex items-center justify-center gap-2 mb-5 hover:opacity-80 transition-opacity"
+        >
           <span class="text-4xl">🐱</span>
           <span class="text-3xl font-bold tracking-tight text-rose-400">Ziggy</span>
         </RouterLink>
-        <h1 class="text-2xl font-bold text-[var(--text)]">{{ title }}</h1>
-        <p v-if="subtitle" class="text-sm text-[var(--text-2)] mt-1.5">{{ subtitle }}</p>
+        <h1 class="text-2xl font-bold text-[var(--text)]">
+          {{ title }}
+        </h1>
+        <p
+          v-if="subtitle"
+          class="text-sm text-[var(--text-2)] mt-1.5"
+        >
+          {{ subtitle }}
+        </p>
       </div>
 
       <!-- Card -->
@@ -57,7 +67,10 @@ defineEmits<{
           </BaseButton>
         </form>
 
-        <div v-if="$slots.footer" class="mt-6 text-center text-sm text-[var(--text-2)]">
+        <div
+          v-if="$slots.footer"
+          class="mt-6 text-center text-sm text-[var(--text-2)]"
+        >
           <slot name="footer" />
         </div>
       </div>

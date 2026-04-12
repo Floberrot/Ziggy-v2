@@ -11,6 +11,12 @@ defineProps<{
   onToday?: boolean
   /** Compact sizing for month view cells */
   compact?: boolean
+  /**
+   * Visual style:
+   * - 'filled' (default): solid tinted background — the chip has been placed (done)
+   * - 'outlined': border only, no fill — chip type is scheduled but not yet done (todo)
+   */
+  variant?: 'filled' | 'outlined'
 }>()
 
 defineEmits<{
@@ -41,20 +47,25 @@ function onMouseLeave() {
     <button
       ref="buttonRef"
       :style="onToday
-        ? { background: 'rgba(255,255,255,0.92)', borderColor: 'rgba(255,255,255,0.6)', color }
-        : { background: color + '18', borderColor: color + '80', color }"
+        ? { background: variant === 'outlined' ? 'transparent' : 'rgba(255,255,255,0.92)', borderColor: 'rgba(255,255,255,0.6)', color }
+        : variant === 'outlined'
+          ? { background: 'transparent', borderColor: color, color }
+          : { background: color + '22', borderColor: color + '80', color }"
       :class="[
         'w-full flex items-center font-semibold leading-none rounded-lg border',
         'hover:brightness-95 active:scale-[0.97] transition-all',
         compact ? 'gap-1 px-1.5 py-1' : 'gap-1.5 px-2 py-1.5',
+        variant === 'outlined' ? 'border-dashed opacity-70' : '',
       ]"
       @click="$emit('click')"
       @mouseenter="onMouseEnter"
       @mouseleave="onMouseLeave"
     >
-      <!-- Color dot -->
+      <!-- Color dot: filled = solid, outlined = ring only -->
       <span
-        :style="{ background: color }"
+        :style="variant === 'outlined'
+          ? { border: `1.5px solid ${color}`, background: 'transparent' }
+          : { background: color }"
         :class="['rounded-full flex-shrink-0', compact ? 'w-1.5 h-1.5' : 'w-2 h-2']"
       />
       <span :class="['truncate flex-1 min-w-0', compact ? 'text-[11px]' : 'text-xs']">{{ name }}</span>
@@ -77,16 +88,33 @@ function onMouseLeave() {
                w-max max-w-52 text-left"
       >
         <div class="flex items-center gap-2 mb-0.5">
-          <span :style="{ background: color }" class="w-2 h-2 rounded-full flex-shrink-0" />
+          <span
+            :style="{ background: color }"
+            class="w-2 h-2 rounded-full flex-shrink-0"
+          />
           <span class="font-bold text-sm">{{ name }}</span>
         </div>
-        <div class="text-white/50 tabular-nums">{{ time }}</div>
+        <div class="text-white/50 tabular-nums">
+          {{ time }}
+        </div>
         <div
           v-if="author"
           class="mt-1 flex items-center gap-1 text-white/60"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-2.5 h-2.5 flex-shrink-0">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="w-2.5 h-2.5 flex-shrink-0"
+          >
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle
+              cx="12"
+              cy="7"
+              r="4"
+            />
           </svg>
           <span>{{ author }}</span>
         </div>

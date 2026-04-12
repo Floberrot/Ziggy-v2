@@ -147,15 +147,37 @@ function handleDelete(chipType: ChipType): void {
     <div class="max-w-3xl mx-auto px-6 py-10">
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-[var(--text)]">Chip Types 🎨</h1>
-          <p class="text-[var(--text-2)] mt-1">Create labels to color-code your calendar.</p>
+          <h1 class="text-3xl font-bold text-[var(--text)]">
+            Chip Types 🎨
+          </h1>
+          <p class="text-[var(--text-2)] mt-1">
+            Create labels to color-code your calendar.
+          </p>
         </div>
-        <BaseButton variant="primary" @click="openCreate">+ New chip type</BaseButton>
+        <BaseButton
+          variant="primary"
+          @click="openCreate"
+        >
+          + New chip type
+        </BaseButton>
       </div>
 
-      <div v-if="isPending" class="text-center py-16 text-[var(--text-3)]">Loading…</div>
-      <div v-else-if="isError" class="text-center py-16 text-red-400">Failed to load chip types.</div>
-      <div v-else-if="!chipTypes?.length" class="text-center py-16 text-[var(--text-3)]">
+      <div
+        v-if="isPending"
+        class="text-center py-16 text-[var(--text-3)]"
+      >
+        Loading…
+      </div>
+      <div
+        v-else-if="isError"
+        class="text-center py-16 text-red-400"
+      >
+        Failed to load chip types.
+      </div>
+      <div
+        v-else-if="!chipTypes?.length"
+        class="text-center py-16 text-[var(--text-3)]"
+      >
         No chip types yet. Create your first one!
       </div>
 
@@ -220,8 +242,14 @@ function handleDelete(chipType: ChipType): void {
       :title="editingChipType ? 'Edit chip type' : 'New chip type'"
       @close="closeModal"
     >
-      <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
-        <div v-if="formError" class="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400">
+      <form
+        class="flex flex-col gap-4"
+        @submit.prevent="handleSubmit"
+      >
+        <div
+          v-if="formError"
+          class="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400"
+        >
           {{ formError }}
         </div>
 
@@ -243,11 +271,29 @@ function handleDelete(chipType: ChipType): void {
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all hover:brightness-90 active:scale-95"
               @click="form.color = randomColor()"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="w-3.5 h-3.5"
+              >
                 <polyline points="16 3 21 3 21 8" />
-                <line x1="4" y1="20" x2="21" y2="3" />
+                <line
+                  x1="4"
+                  y1="20"
+                  x2="21"
+                  y2="3"
+                />
                 <polyline points="21 16 21 21 16 21" />
-                <line x1="15" y1="15" x2="21" y2="21" />
+                <line
+                  x1="15"
+                  y1="15"
+                  x2="21"
+                  y2="21"
+                />
               </svg>
               Random
             </button>
@@ -255,8 +301,18 @@ function handleDelete(chipType: ChipType): void {
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
-          <BaseButton type="button" variant="secondary" @click="closeModal">Cancel</BaseButton>
-          <BaseButton type="submit" variant="primary" :loading="creating || updating">
+          <BaseButton
+            type="button"
+            variant="secondary"
+            @click="closeModal"
+          >
+            Cancel
+          </BaseButton>
+          <BaseButton
+            type="submit"
+            variant="primary"
+            :loading="creating || updating"
+          >
             {{ editingChipType ? 'Save changes' : 'Create' }}
           </BaseButton>
         </div>

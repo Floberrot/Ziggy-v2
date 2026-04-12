@@ -95,9 +95,14 @@ function chipName(id: string): string {
 
       <div class="relative max-w-5xl mx-auto">
         <div class="text-center mb-16">
-          <BaseBadge variant="default" class="mb-6">🐾 Cat care, simplified</BaseBadge>
+          <BaseBadge
+            variant="default"
+            class="mb-6"
+          >
+            🐾 Cat care, simplified
+          </BaseBadge>
           <h1 class="text-5xl sm:text-6xl font-extrabold text-[var(--text)] leading-tight mb-6">
-            A calendar for<br />
+            A calendar for<br>
             <span class="text-rose-400">every cat</span> you love
           </h1>
           <p class="text-lg text-[var(--text-2)] max-w-xl mx-auto mb-10 leading-relaxed">
@@ -107,15 +112,24 @@ function chipName(id: string): string {
           <div class="flex flex-col sm:flex-row gap-3 justify-center">
             <template v-if="authStore.isAuthenticated">
               <RouterLink to="/dashboard">
-                <BaseButton size="lg">Go to my dashboard 🐱</BaseButton>
+                <BaseButton size="lg">
+                  Go to my dashboard 🐱
+                </BaseButton>
               </RouterLink>
             </template>
             <template v-else>
               <RouterLink to="/register">
-                <BaseButton size="lg">Start for free 🐱</BaseButton>
+                <BaseButton size="lg">
+                  Start for free 🐱
+                </BaseButton>
               </RouterLink>
               <RouterLink to="/login">
-                <BaseButton variant="secondary" size="lg">Sign in</BaseButton>
+                <BaseButton
+                  variant="secondary"
+                  size="lg"
+                >
+                  Sign in
+                </BaseButton>
               </RouterLink>
             </template>
           </div>
@@ -126,10 +140,16 @@ function chipName(id: string): string {
           <!-- Demo header -->
           <div class="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--surface-2)]">
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center text-lg shadow-lg shadow-rose-500/30">🐱</div>
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center text-lg shadow-lg shadow-rose-500/30">
+                🐱
+              </div>
               <div>
-                <p class="font-bold text-[var(--text)] leading-none">Mochi</p>
-                <p class="text-xs text-[var(--text-3)]">Siamese · 3.8 kg</p>
+                <p class="font-bold text-[var(--text)] leading-none">
+                  Mochi
+                </p>
+                <p class="text-xs text-[var(--text-3)]">
+                  Siamese · 3.8 kg
+                </p>
               </div>
             </div>
             <div class="flex items-center gap-2">
@@ -151,7 +171,11 @@ function chipName(id: string): string {
             </div>
 
             <div class="grid grid-cols-7 gap-1">
-              <div v-for="i in MARCH_OFFSET" :key="`pad-${i}`" class="aspect-square" />
+              <div
+                v-for="i in MARCH_OFFSET"
+                :key="`pad-${i}`"
+                class="aspect-square"
+              />
               <div
                 v-for="day in 31"
                 :key="day"
@@ -204,7 +228,10 @@ function chipName(id: string): string {
               :key="ct.id"
               class="flex items-center gap-1.5 text-xs text-[var(--text-2)] font-medium"
             >
-              <span :style="{ backgroundColor: ct.color }" class="w-2 h-2 rounded-full" />
+              <span
+                :style="{ backgroundColor: ct.color }"
+                class="w-2 h-2 rounded-full"
+              />
               {{ ct.name }}
             </div>
           </div>
@@ -216,8 +243,12 @@ function chipName(id: string): string {
     <section class="py-20 px-6 bg-[var(--surface)]">
       <div class="max-w-5xl mx-auto">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-[var(--text)] mb-3">Two views, one goal</h2>
-          <p class="text-[var(--text-2)]">Switch between month and week to plan ahead or focus on today.</p>
+          <h2 class="text-3xl font-bold text-[var(--text)] mb-3">
+            Two views, one goal
+          </h2>
+          <p class="text-[var(--text-2)]">
+            Switch between month and week to plan ahead or focus on today.
+          </p>
         </div>
 
         <div class="bg-[var(--surface-2)] rounded-2xl border border-[var(--border-md)] overflow-hidden">
@@ -249,8 +280,12 @@ function chipName(id: string): string {
                   col.isToday ? 'bg-rose-500' : 'bg-[var(--surface-3)]',
                 ]"
               >
-                <div :class="['text-xs font-semibold', col.isToday ? 'text-rose-100' : 'text-[var(--text-3)]']">{{ col.day }}</div>
-                <div :class="['text-xl font-bold', col.isToday ? 'text-white' : 'text-[var(--text)]']">{{ col.num }}</div>
+                <div :class="['text-xs font-semibold', col.isToday ? 'text-rose-100' : 'text-[var(--text-3)]']">
+                  {{ col.day }}
+                </div>
+                <div :class="['text-xl font-bold', col.isToday ? 'text-white' : 'text-[var(--text)]']">
+                  {{ col.num }}
+                </div>
               </div>
               <div class="p-2 flex flex-col gap-1.5 min-h-28">
                 <div
@@ -275,18 +310,28 @@ function chipName(id: string): string {
     <!-- ── Features ────────────────────────────────────────────────── -->
     <section class="py-20 px-6">
       <div class="max-w-4xl mx-auto">
-        <h2 class="text-3xl font-bold text-center text-[var(--text)] mb-3">Everything your cat needs</h2>
-        <p class="text-center text-[var(--text-2)] mb-12">Built for cat owners who care about every detail 🐾</p>
+        <h2 class="text-3xl font-bold text-center text-[var(--text)] mb-3">
+          Everything your cat needs
+        </h2>
+        <p class="text-center text-[var(--text-2)] mb-12">
+          Built for cat owners who care about every detail 🐾
+        </p>
         <div class="grid sm:grid-cols-2 gap-4">
           <div
             v-for="feature in features"
             :key="feature.title"
             class="flex gap-4 p-6 rounded-2xl border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border-md)] hover:bg-[var(--surface-2)] transition-all"
           >
-            <div class="text-3xl shrink-0">{{ feature.emoji }}</div>
+            <div class="text-3xl shrink-0">
+              {{ feature.emoji }}
+            </div>
             <div>
-              <h3 class="font-semibold text-[var(--text)] mb-1">{{ feature.title }}</h3>
-              <p class="text-sm text-[var(--text-2)] leading-relaxed">{{ feature.description }}</p>
+              <h3 class="font-semibold text-[var(--text)] mb-1">
+                {{ feature.title }}
+              </h3>
+              <p class="text-sm text-[var(--text-2)] leading-relaxed">
+                {{ feature.description }}
+              </p>
             </div>
           </div>
         </div>
@@ -300,8 +345,12 @@ function chipName(id: string): string {
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-rose-500/10 rounded-full blur-[80px]" />
       </div>
       <div class="relative max-w-xl mx-auto text-center">
-        <div class="text-5xl mb-4">🐱</div>
-        <h2 class="text-3xl font-bold text-[var(--text)] mb-4">Ready to spoil your cats?</h2>
+        <div class="text-5xl mb-4">
+          🐱
+        </div>
+        <h2 class="text-3xl font-bold text-[var(--text)] mb-4">
+          Ready to spoil your cats?
+        </h2>
         <p class="text-[var(--text-2)] mb-8 leading-relaxed">
           Join Ziggy and make sure your kitties never miss a feeding, a vet visit, or a cuddle session.
         </p>

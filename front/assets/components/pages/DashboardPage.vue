@@ -6,7 +6,7 @@ import { calendarApi, type PlaceChipRequest } from '../../api/calendar'
 import { catsApi } from '../../api/cats'
 import { chipTypesApi } from '../../api/chipTypes'
 import { authApi } from '../../api/auth'
-import type { EnrichedChip } from '../../types'
+import type { ChipType, EnrichedChip } from '../../types'
 import { useUiStore } from '../../stores/useUiStore'
 import { useAuthStore } from '../../stores/useAuthStore'
 import BaseButton from '../atoms/BaseButton.vue'
@@ -90,6 +90,8 @@ const enrichedChips = computed((): EnrichedChip[] => {
     chipTypeColor: typeMap[chip.chipTypeId]?.color ?? '#999',
   }))
 })
+
+const scheduledChipTypeIds = computed((): string[] => calendar.value?.scheduledChipTypeIds ?? [])
 
 // ─── Navigation state ────────────────────────────────────────────────────────
 
@@ -247,12 +249,70 @@ const { mutate: removeChip, isPending: removing } = useMutation({
     uiStore.addNotification(err instanceof Error ? err.message : 'Failed to remove chip.', 'error')
   },
 })
+
+// ─── Scheduled chip type toggle ───────────────────────────────────────────────
+
+const { mutate: toggleScheduledChip } = useMutation({
+  mutationFn: (payload: { date: string; chipTypeId: string; existingChipId: string | null }) => {
+    if (payload.existingChipId !== null) {
+      return calendarApi.removeChip(selectedCatId.value, payload.existingChipId)
+    }
+    const dateTime = `${payload.date}T00:00:00+00:00`
+    return calendarApi.placeChip(selectedCatId.value, { chipTypeId: payload.chipTypeId, dateTime })
+  },
+  onSuccess: (_, payload) => {
+    queryClient.invalidateQueries({ queryKey: ['calendar', selectedCatId] })
+    const action = payload.existingChipId !== null ? 'Marked as undone.' : 'Marked as done.'
+    uiStore.addNotification(action, 'success')
+  },
+  onError: (err) => {
+    uiStore.addNotification(err instanceof Error ? err.message : 'Failed to update chip.', 'error')
+  },
+})
+
+// ─── Schedule chip type management ───────────────────────────────────────────
+
+const showScheduleModal = ref(false)
+
+const { mutate: scheduleChipType } = useMutation({
+  mutationFn: (chipTypeId: string) => calendarApi.scheduleChipType(selectedCatId.value, chipTypeId),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['calendar', selectedCatId] })
+    uiStore.addNotification('Chip type scheduled.', 'success')
+  },
+  onError: (err) => {
+    uiStore.addNotification(err instanceof Error ? err.message : 'Failed to schedule chip type.', 'error')
+  },
+})
+
+const { mutate: unscheduleChipType } = useMutation({
+  mutationFn: (chipTypeId: string) => calendarApi.unscheduleChipType(selectedCatId.value, chipTypeId),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['calendar', selectedCatId] })
+    uiStore.addNotification('Chip type unscheduled.', 'success')
+  },
+  onError: (err) => {
+    uiStore.addNotification(err instanceof Error ? err.message : 'Failed to unschedule chip type.', 'error')
+  },
+})
+
+function toggleScheduleForChipType(chipType: ChipType): void {
+  if (scheduledChipTypeIds.value.includes(chipType.id)) {
+    unscheduleChipType(chipType.id)
+  } else {
+    scheduleChipType(chipType.id)
+  }
+}
+
+// Whether the chip in the modal belongs to a scheduled type
+const selectedChipIsScheduled = computed(() =>
+  selectedChip.value !== null && scheduledChipTypeIds.value.includes(selectedChip.value.chipTypeId),
+)
 </script>
 
 <template>
   <MainTemplate>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-
       <!-- Admin warning banner -->
       <div
         v-if="me?.role === 'ROLE_ADMIN'"
@@ -262,7 +322,12 @@ const { mutate: removeChip, isPending: removing } = useMutation({
         <div class="flex-1 text-sm">
           <span class="font-semibold">You are logged in as Administrator.</span>
           <span class="ml-2 text-amber-400/70">Data shown is for your admin account. Use the</span>
-          <RouterLink to="/admin" class="ml-1 underline hover:text-amber-300">Admin Panel</RouterLink>
+          <RouterLink
+            to="/admin"
+            class="ml-1 underline hover:text-amber-300"
+          >
+            Admin Panel
+          </RouterLink>
           <span class="text-amber-400/70"> to manage all users and resources.</span>
         </div>
       </div>
@@ -293,21 +358,44 @@ const { mutate: removeChip, isPending: removing } = useMutation({
             to="/cats"
             class="flex items-center gap-1.5 px-3 py-2 rounded-2xl border-2 border-dashed border-[var(--border)] text-xs text-[var(--text-3)] hover:border-rose-400/50 hover:text-rose-400 transition-all whitespace-nowrap"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            <svg
+              class="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Manage cats
           </RouterLink>
         </div>
 
         <!-- Quick links — owner only -->
-        <div v-if="isOwner" class="flex items-center gap-2 flex-shrink-0">
+        <div
+          v-if="isOwner"
+          class="flex items-center gap-2 flex-shrink-0"
+        >
           <RouterLink
             to="/chip-types"
             class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-[var(--text-2)] hover:text-rose-400 hover:bg-rose-500/10 border border-[var(--border)] transition-all"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            <svg
+              class="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+              />
             </svg>
             Chip types
           </RouterLink>
@@ -315,8 +403,18 @@ const { mutate: removeChip, isPending: removing } = useMutation({
             to="/pet-sitters"
             class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-[var(--text-2)] hover:text-rose-400 hover:bg-rose-500/10 border border-[var(--border)] transition-all"
           >
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            <svg
+              class="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
             </svg>
             Pet sitters
           </RouterLink>
@@ -324,9 +422,16 @@ const { mutate: removeChip, isPending: removing } = useMutation({
       </div>
 
       <!-- No cats state -->
-      <div v-if="cats && !cats.length" class="text-center py-24 text-[var(--text-3)]">
-        <p class="text-lg font-semibold text-[var(--text-2)] mb-2">No cats yet</p>
-        <p class="text-sm mb-5">Add your first cat to start using the calendar.</p>
+      <div
+        v-if="cats && !cats.length"
+        class="text-center py-24 text-[var(--text-3)]"
+      >
+        <p class="text-lg font-semibold text-[var(--text-2)] mb-2">
+          No cats yet
+        </p>
+        <p class="text-sm mb-5">
+          Add your first cat to start using the calendar.
+        </p>
         <RouterLink
           to="/cats"
           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-500 text-white text-sm font-semibold hover:bg-rose-600 transition-colors shadow-lg shadow-rose-500/30"
@@ -348,7 +453,12 @@ const { mutate: removeChip, isPending: removing } = useMutation({
               <h1 class="text-lg font-bold text-[var(--text)] leading-tight">
                 {{ selectedCat.name }}'s calendar
               </h1>
-              <p v-if="selectedCat.breed" class="text-xs text-[var(--text-3)]">{{ selectedCat.breed }}</p>
+              <p
+                v-if="selectedCat.breed"
+                class="text-xs text-[var(--text-3)]"
+              >
+                {{ selectedCat.breed }}
+              </p>
             </div>
           </div>
 
@@ -359,18 +469,30 @@ const { mutate: removeChip, isPending: removing } = useMutation({
               <button
                 :class="['px-3 py-1.5 text-sm font-medium transition-colors', viewMode === 'day' ? 'bg-rose-500 text-white' : 'text-[var(--text-2)] hover:text-[var(--text)]']"
                 @click="viewMode = 'day'"
-              >Day</button>
+              >
+                Day
+              </button>
               <button
                 :class="['px-3 py-1.5 text-sm font-medium transition-colors', viewMode === 'week' ? 'bg-rose-500 text-white' : 'text-[var(--text-2)] hover:text-[var(--text)]']"
                 @click="viewMode = 'week'"
-              >Week</button>
+              >
+                Week
+              </button>
               <button
                 :class="['px-3 py-1.5 text-sm font-medium transition-colors', viewMode === 'month' ? 'bg-rose-500 text-white' : 'text-[var(--text-2)] hover:text-[var(--text)]']"
                 @click="viewMode = 'month'"
-              >Month</button>
+              >
+                Month
+              </button>
             </div>
 
-            <BaseButton variant="secondary" size="sm" @click="goToday">Today</BaseButton>
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              @click="goToday"
+            >
+              Today
+            </BaseButton>
 
             <!-- Navigation arrows -->
             <div class="flex items-center gap-1">
@@ -379,8 +501,18 @@ const { mutate: removeChip, isPending: removing } = useMutation({
                 aria-label="Previous"
                 @click="prev"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </button>
               <span class="text-sm font-semibold text-[var(--text)] min-w-40 text-center select-none">{{ headerLabel }}</span>
@@ -389,25 +521,69 @@ const { mutate: removeChip, isPending: removing } = useMutation({
                 aria-label="Next"
                 @click="next"
               >
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Chip type legend -->
-        <div v-if="chipTypes?.length" class="flex flex-wrap items-center gap-2 mb-4">
+        <!-- Chip type legend with schedule toggles -->
+        <div
+          v-if="chipTypes?.length"
+          class="flex flex-wrap items-center gap-2 mb-4"
+        >
           <div
             v-for="ct in chipTypes"
             :key="ct.id"
             :style="{ backgroundColor: ct.color + '18', borderColor: ct.color + '40', color: ct.color }"
             class="flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full border"
           >
-            <span :style="{ backgroundColor: ct.color }" class="w-1.5 h-1.5 rounded-full" />
+            <span
+              :style="{ backgroundColor: ct.color }"
+              class="w-1.5 h-1.5 rounded-full"
+            />
             {{ ct.name }}
           </div>
+
+          <!-- Schedule button — owner only -->
+          <button
+            v-if="isOwner"
+            class="flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border border-dashed border-[var(--border)] text-[var(--text-3)] hover:border-rose-400/50 hover:text-rose-400 transition-all"
+            @click="showScheduleModal = true"
+          >
+            <svg
+              class="w-3 h-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            Schedule
+            <span
+              v-if="scheduledChipTypeIds.length"
+              class="ml-0.5 bg-rose-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold"
+            >
+              {{ scheduledChipTypeIds.length }}
+            </span>
+          </button>
         </div>
 
         <!-- Calendar views -->
@@ -416,8 +592,11 @@ const { mutate: removeChip, isPending: removing } = useMutation({
             v-if="viewMode === 'day'"
             :day="currentDay"
             :chips="enrichedChips"
+            :scheduled-chip-type-ids="scheduledChipTypeIds"
+            :chip-types="chipTypes ?? []"
             @day-click="openPlaceModal"
             @chip-click="openChipModal"
+            @scheduled-chip-toggle="toggleScheduledChip"
           />
           <CalendarMonthView
             v-else-if="viewMode === 'month'"
@@ -431,8 +610,11 @@ const { mutate: removeChip, isPending: removing } = useMutation({
             v-else
             :week-start="weekStart"
             :chips="enrichedChips"
+            :scheduled-chip-type-ids="scheduledChipTypeIds"
+            :chip-types="chipTypes ?? []"
             @day-click="openPlaceModal"
             @chip-click="openChipModal"
+            @scheduled-chip-toggle="toggleScheduledChip"
           />
         </div>
 
@@ -442,7 +624,10 @@ const { mutate: removeChip, isPending: removing } = useMutation({
           class="mt-4 text-center text-sm text-[var(--text-2)] bg-[var(--surface)] rounded-xl py-4 border border-[var(--border)]"
         >
           Create chip types first to start placing them on the calendar.
-          <RouterLink to="/chip-types" class="ml-1 text-rose-400 font-semibold hover:text-rose-300 hover:underline">
+          <RouterLink
+            to="/chip-types"
+            class="ml-1 text-rose-400 font-semibold hover:text-rose-300 hover:underline"
+          >
             Go to chip types →
           </RouterLink>
         </div>
@@ -455,8 +640,14 @@ const { mutate: removeChip, isPending: removing } = useMutation({
       :title="`Add chip — ${selectedDate}`"
       @close="showPlaceModal = false"
     >
-      <form class="flex flex-col gap-4" @submit.prevent="submitPlaceChip">
-        <div v-if="placeError" class="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400">
+      <form
+        class="flex flex-col gap-4"
+        @submit.prevent="submitPlaceChip"
+      >
+        <div
+          v-if="placeError"
+          class="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-xl text-sm text-red-400"
+        >
           {{ placeError }}
         </div>
 
@@ -497,7 +688,7 @@ const { mutate: removeChip, isPending: removing } = useMutation({
             v-model="placeTime"
             type="time"
             class="w-full px-4 py-2.5 rounded-xl border border-[var(--border-md)] text-sm bg-[var(--surface-3)] text-[var(--text)] focus:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 outline-none"
-          />
+          >
         </div>
 
         <div class="flex flex-col gap-1.5">
@@ -513,8 +704,20 @@ const { mutate: removeChip, isPending: removing } = useMutation({
         </div>
 
         <div class="flex justify-end gap-3">
-          <BaseButton type="button" variant="secondary" @click="showPlaceModal = false">Cancel</BaseButton>
-          <BaseButton type="submit" variant="primary" :loading="placing">Add chip</BaseButton>
+          <BaseButton
+            type="button"
+            variant="secondary"
+            @click="showPlaceModal = false"
+          >
+            Cancel
+          </BaseButton>
+          <BaseButton
+            type="submit"
+            variant="primary"
+            :loading="placing"
+          >
+            Add chip
+          </BaseButton>
         </div>
       </form>
     </BaseModal>
@@ -533,33 +736,158 @@ const { mutate: removeChip, isPending: removing } = useMutation({
             class="w-5 h-5 rounded-full shadow-lg flex-shrink-0"
           />
           <div>
-            <p class="font-semibold text-[var(--text)]">{{ selectedChip.chipTypeName }}</p>
+            <p class="font-semibold text-[var(--text)]">
+              {{ selectedChip.chipTypeName }}
+            </p>
             <p class="text-sm text-[var(--text-2)]">
               {{ selectedChip.date.slice(0, 10) }}
               <span class="opacity-40 mx-1">·</span>
               {{ new Date(selectedChip.date).toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false }) }}
             </p>
-            <p v-if="selectedChip.authorUsername" class="text-xs text-[var(--text-3)] mt-0.5 flex items-center gap-1">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 flex-shrink-0">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+            <p
+              v-if="selectedChip.authorUsername"
+              class="text-xs text-[var(--text-3)] mt-0.5 flex items-center gap-1"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="w-3 h-3 flex-shrink-0"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle
+                  cx="12"
+                  cy="7"
+                  r="4"
+                />
               </svg>
               {{ selectedChip.authorUsername }}
             </p>
           </div>
         </div>
 
-        <div v-if="selectedChip.note" class="bg-[var(--surface-3)] rounded-xl px-4 py-3 text-sm text-[var(--text-2)] border border-[var(--border)]">
+        <!-- Scheduled chip toggle -->
+        <div
+          v-if="selectedChipIsScheduled"
+          class="flex items-center gap-3 px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-3)]"
+        >
+          <span class="text-sm text-[var(--text-2)] flex-1">Scheduled chip — mark as undone?</span>
+          <button
+            class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all hover:brightness-95"
+            :style="{ borderColor: selectedChip.chipTypeColor + '60', color: selectedChip.chipTypeColor, background: selectedChip.chipTypeColor + '15' }"
+            :disabled="removing"
+            @click="removeChip(selectedChip!.id)"
+          >
+            <span
+              class="w-3.5 h-3.5 rounded flex items-center justify-center border-2"
+              :style="{ background: selectedChip.chipTypeColor, borderColor: selectedChip.chipTypeColor }"
+            >
+              <svg
+                class="w-2 h-2 text-white"
+                viewBox="0 0 12 12"
+                fill="none"
+              >
+                <path
+                  d="M2 6l3 3 5-5"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+            Done — click to undo
+          </button>
+        </div>
+
+        <div
+          v-if="selectedChip.note"
+          class="bg-[var(--surface-3)] rounded-xl px-4 py-3 text-sm text-[var(--text-2)] border border-[var(--border)]"
+        >
           {{ selectedChip.note }}
         </div>
 
         <div class="flex justify-between items-center pt-1">
-          <BaseButton variant="secondary" @click="showChipModal = false">Close</BaseButton>
           <BaseButton
+            variant="secondary"
+            @click="showChipModal = false"
+          >
+            Close
+          </BaseButton>
+          <BaseButton
+            v-if="!selectedChipIsScheduled"
             variant="danger"
             :loading="removing"
             @click="removeChip(selectedChip!.id)"
           >
             Remove chip
+          </BaseButton>
+        </div>
+      </div>
+    </BaseModal>
+
+    <!-- Schedule chip types modal -->
+    <BaseModal
+      :open="showScheduleModal"
+      title="Schedule chip types"
+      @close="showScheduleModal = false"
+    >
+      <div class="flex flex-col gap-3">
+        <p class="text-sm text-[var(--text-2)]">
+          Scheduled chip types appear as daily to-do checkboxes in the day and week views.
+        </p>
+
+        <div class="flex flex-col gap-2">
+          <button
+            v-for="ct in chipTypes ?? []"
+            :key="ct.id"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-sm font-semibold transition-all"
+            :style="scheduledChipTypeIds.includes(ct.id)
+              ? { backgroundColor: ct.color, borderColor: ct.color, color: isLightColor(ct.color) ? '#1a1a1a' : 'white' }
+              : { backgroundColor: ct.color + '18', borderColor: ct.color + '40', color: ct.color }"
+            @click="toggleScheduleForChipType(ct)"
+          >
+            <!-- Checkbox indicator -->
+            <span
+              class="flex-shrink-0 w-5 h-5 rounded flex items-center justify-center border-2 transition-colors"
+              :style="scheduledChipTypeIds.includes(ct.id)
+                ? { background: isLightColor(ct.color) ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.3)', borderColor: isLightColor(ct.color) ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.5)' }
+                : { background: 'transparent', borderColor: ct.color }"
+            >
+              <svg
+                v-if="scheduledChipTypeIds.includes(ct.id)"
+                class="w-3 h-3"
+                :style="{ color: isLightColor(ct.color) ? '#1a1a1a' : 'white' }"
+                viewBox="0 0 12 12"
+                fill="none"
+              >
+                <path
+                  d="M2 6l3 3 5-5"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+            <span class="flex-1 truncate">{{ ct.name }}</span>
+            <span
+              v-if="scheduledChipTypeIds.includes(ct.id)"
+              class="text-xs opacity-70"
+            >
+              Daily
+            </span>
+          </button>
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <BaseButton
+            variant="secondary"
+            @click="showScheduleModal = false"
+          >
+            Done
           </BaseButton>
         </div>
       </div>
